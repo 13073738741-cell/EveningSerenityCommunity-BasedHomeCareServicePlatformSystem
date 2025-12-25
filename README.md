@@ -29,12 +29,35 @@
 
 ### 数据库配置
 
+#### 方法一：使用SQL初始化脚本（推荐）
+
+1. 确保MySQL已安装并运行
+2. 使用root用户执行项目根目录下的初始化脚本：
+```bash
+mysql -u root -p < init_database.sql
+```
+
+或者在MySQL命令行中执行：
+```sql
+source /path/to/init_database.sql
+```
+
+该脚本会自动完成以下操作：
+- 创建数据库 `elderlycare`
+- 创建所有必要的表（users, elderly_info, health_assessment, environment_assessment, care_record）
+- 插入默认管理员用户（admin/111111）
+- 插入8条老人档案示例数据
+
+#### 方法二：手动创建数据库
+
 1. 创建MySQL数据库：
 ```sql
 CREATE DATABASE IF NOT EXISTS elderlycare CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 2. 更新配置文件 `src/main/resources/application.properties` 中的数据库连接信息
+
+3. 启动应用，系统会自动创建表结构并加载示例数据
 
 ### 运行项目
 
