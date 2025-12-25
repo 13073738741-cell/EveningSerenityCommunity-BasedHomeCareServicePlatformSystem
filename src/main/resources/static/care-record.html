@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建立关爱档案 - 桑榆晚情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group.required label::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        .care-level-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .care-level-1 {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .care-level-2 {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .care-level-3 {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #e9ecef;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .care-level-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .care-level-info h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .care-level-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .care-level-info li {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .care-level-info li::before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>建立关爱档案</h1>
+            <p>为老人建立个性化关爱档案和护理计划</p>
+        </div>
+
+        <div class="content">
+            <a href="elderly-management.html" class="back-btn">← 返回老人档案管理</a>
+
+            <div id="message" class="message"></div>
+
+            <div class="info-box">
+                <h3>档案说明</h3>
+                <p>关爱档案包含老人的护理等级、日常护理需求、医疗护理需求、社会支持、应急计划等信息<br>
+                护理等级：一级（轻度）、二级（中度）、三级（重度）</p>
+            </div>
+
+            <form id="careForm">
+                <div class="form-section">
+                    <h2>基本信息</h2>
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="elderlyId">选择老人</label>
+                            <select id="elderlyId" name="elderlyId" required>
+                                <option value="">请选择老人</option>
+                            </select>
+                        </div>
+                        <div class="form-group required">
+                            <label for="createDate">建档日期</label>
+                            <input type="date" id="createDate" name="createDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="caregiverPhone">护理员电话</label>
+                            <input type="tel" id="caregiverPhone" name="caregiverPhone" required placeholder="请输入护理员电话">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="nextReviewDate">下次评估日期</label>
+                            <input type="date" id="nextReviewDate" name="nextReviewDate" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>护理等级</h2>
+                    <div class="care-level-info">
+                        <h4>护理等级说明</h4>
+                        <ul>
+                            <li>一级护理：日常生活基本自理，需要少量帮助</li>
+                            <li>二级护理：日常生活部分自理，需要中等程度帮助</li>
+                            <li>三级护理：日常生活不能自理，需要全面护理</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="careLevel">护理等级</label>
+                            <select id="careLevel" name="careLevel" required>
+                                <option value="">请选择</option>
+                                <option value="一级护理">一级护理</option>
+                                <option value="二级护理">二级护理</option>
+                                <option value="三级护理">三级护理</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="careLevelBadge" class="care-level-badge" style="display: none;"></div>
+                </div>
+
+                <div class="form-section">
+                    <h2>护理需求</h2>
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="dailyCareNeeds">日常护理需求</label>
+                            <textarea id="dailyCareNeeds" name="dailyCareNeeds" required placeholder="请描述日常护理需求，如饮食、起居、卫生等"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="medicalCareNeeds">医疗护理需求</label>
+                            <textarea id="medicalCareNeeds" name="medicalCareNeeds" required placeholder="请描述医疗护理需求，如用药、康复、检查等"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="socialSupport">社会支持</label>
+                            <textarea id="socialSupport" name="socialSupport" required placeholder="请描述社会支持情况，如志愿者服务、社区活动等"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>应急计划</h2>
+                    <div class="form-row">
+                        <div class="form-group required">
+                            <label for="emergencyPlan">应急预案</label>
+                            <textarea id="emergencyPlan" name="emergencyPlan" required placeholder="请描述应急处理流程和联系人信息"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>备注</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="notes">其他说明</label>
+                            <textarea id="notes" name="notes" placeholder="请输入其他需要说明的事项"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">保存档案</button>
+                    <button type="reset" class="btn btn-secondary">重置表单</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadElderlyList();
+            setDefaultDate();
+            updateCareLevelBadge();
+        });
+
+        async function loadElderlyList() {
+            try {
+                const response = await fetch('/api/elderly');
+                const elderlyList = await response.json();
+
+                const select = document.getElementById('elderlyId');
+                select.innerHTML = '<option value="">请选择老人</option>';
+
+                elderlyList.forEach(elderly => {
+                    const option = document.createElement('option');
+                    option.value = elderly.id;
+                    option.textContent = `${elderly.name} (${elderly.idCard})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('加载老人列表失败:', error);
+            }
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('createDate').value = today;
+
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            document.getElementById('nextReviewDate').value = nextMonth.toISOString().split('T')[0];
+        }
+
+        document.getElementById('careLevel').addEventListener('change', function() {
+            updateCareLevelBadge();
+        });
+
+        function updateCareLevelBadge() {
+            const careLevel = document.getElementById('careLevel').value;
+            const badge = document.getElementById('careLevelBadge');
+
+            if (!careLevel) {
+                badge.style.display = 'none';
+                return;
+            }
+
+            badge.style.display = 'inline-block';
+            badge.textContent = careLevel;
+            badge.className = 'care-level-badge';
+
+            if (careLevel === '一级护理') {
+                badge.classList.add('care-level-1');
+            } else if (careLevel === '二级护理') {
+                badge.classList.add('care-level-2');
+            } else if (careLevel === '三级护理') {
+                badge.classList.add('care-level-3');
+            }
+        }
+
+        document.getElementById('careForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            data.caregiverName = localStorage.getItem('username');
+
+            try {
+                const response = await fetch('/api/care-records', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage('档案保存成功！', 'success');
+                    this.reset();
+                    setDefaultDate();
+                    loadElderlyList();
+                    updateCareLevelBadge();
+                } else {
+                    showMessage('保存失败：' + (result.message || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showMessage('网络错误，请稍后重试', 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
