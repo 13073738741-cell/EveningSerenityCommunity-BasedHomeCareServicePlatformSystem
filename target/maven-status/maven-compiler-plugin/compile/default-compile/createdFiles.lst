@@ -1,0 +1,17 @@
+com\elderlycare\service\EnvironmentAssessmentService.class
+com\elderlycare\repository\CareRecordRepository.class
+com\elderlycare\controller\CareRecordController.class
+com\elderlycare\service\ElderlyInfoService.class
+com\elderlycare\EveningSerenityApplication.class
+com\elderlycare\repository\HealthAssessmentRepository.class
+com\elderlycare\service\CareRecordService.class
+com\elderlycare\controller\EnvironmentAssessmentController.class
+com\elderlycare\repository\EnvironmentAssessmentRepository.class
+com\elderlycare\service\HealthAssessmentService.class
+com\elderlycare\entity\HealthAssessment.class
+com\elderlycare\controller\HealthAssessmentController.class
+com\elderlycare\entity\EnvironmentAssessment.class
+com\elderlycare\controller\ElderlyInfoController.class
+com\elderlycare\entity\ElderlyInfo.class
+com\elderlycare\entity\CareRecord.class
+com\elderlycare\repository\ElderlyInfoRepository.class

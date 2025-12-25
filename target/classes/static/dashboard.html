@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统首页 - 桑榆晚情社区居家养老服务平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-name {
+            font-size: 14px;
+        }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .welcome-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .welcome-section h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .welcome-section p {
+            color: #666;
+            font-size: 16px;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .feature-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        .feature-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .feature-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 桑榆晚情社区居家养老服务平台</h1>
+        <div class="user-info">
+            <span class="user-name">欢迎，<span id="username"></span></span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="welcome-section">
+            <h2>欢迎使用桑榆晚情社区居家养老服务平台</h2>
+            <p>这是一个专为社区居家养老服务的综合管理平台，提供老人档案管理、居家环境评估、健康状况评估和护理记录等功能。</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card" onclick="window.location.href='/elderly-list.html'">
+                <div class="feature-icon">👴</div>
+                <div class="feature-title">老人档案管理</div>
+                <div class="feature-desc">完整记录老人基本信息、联系方式、居住情况等</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏠</div>
+                <div class="feature-title">居家环境评估</div>
+                <div class="feature-desc">评估老人居住环境的安全性和适老性</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">❤️</div>
+                <div class="feature-title">健康状况评估</div>
+                <div class="feature-desc">全面评估老人身体状况和生活能力</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">护理记录管理</div>
+                <div class="feature-desc">记录日常护理活动和重要事件</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username');
+            
+            if (!isLoggedIn || !username) {
+                window.location.href = '/';
+                return;
+            }
+            
+            document.getElementById('username').textContent = username;
+        });
+        
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
