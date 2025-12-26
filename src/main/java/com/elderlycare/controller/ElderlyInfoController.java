@@ -1,5 +1,6 @@
 package com.elderlycare.controller;
 
+import com.elderlycare.dto.ApiResponse;
 import com.elderlycare.entity.ElderlyInfo;
 import com.elderlycare.service.ElderlyInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,10 @@ public class ElderlyInfoController {
     }
     
     @GetMapping
-    public ResponseEntity<List<ElderlyInfo>> getAllElderly() {
+    public ResponseEntity<ApiResponse<List<ElderlyInfo>>> getAllElderly() {
         List<ElderlyInfo> elderlyList = elderlyInfoService.findAll();
-        return new ResponseEntity<>(elderlyList, HttpStatus.OK);
+        ApiResponse<List<ElderlyInfo>> response = ApiResponse.success(elderlyList, elderlyList.size());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping("/search/name")

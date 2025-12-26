@@ -1,0 +1,170 @@
+<template>
+  <el-container class="layout-container">
+    <el-aside width="250px" class="aside">
+      <div class="logo">
+        <h2>桑榆晚情</h2>
+        <p>社区居家养老服务平台</p>
+      </div>
+      
+      <el-menu
+        :default-active="activeMenu"
+        class="el-menu-vertical"
+        router
+      >
+        <el-menu-item index="/elderly-manage">
+          <el-icon><User /></el-icon>
+          <span>老人档案管理</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
+    
+    <el-container>
+      <el-header class="header">
+        <div class="header-left">
+          <h3>晚霞社区居家养老服务平台</h3>
+        </div>
+        <div class="header-right">
+          <el-dropdown @command="handleCommand">
+            <span class="user-info">
+              <el-icon><Avatar /></el-icon>
+              {{ username }}
+              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </el-header>
+      
+      <el-main class="main">
+        <router-view />
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
+const router = useRouter()
+const route = useRoute()
+
+const username = ref('')
+
+const activeMenu = computed(() => route.path)
+
+onMounted(() => {
+  username.value = localStorage.getItem('username') || '管理员'
+})
+
+const handleCommand = async (command) => {
+  if (command === 'logout') {
+    try {
+      await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      localStorage.removeItem('role')
+      
+      ElMessage.success('已退出登录')
+      router.push('/login')
+    } catch (error) {
+      // 用户取消操作
+    }
+  }
+}
+</script>
+
+<style scoped>
+.layout-container {
+  height: 100vh;
+}
+
+.aside {
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.logo {
+  padding: 30px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.logo p {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.el-menu-vertical {
+  border: none;
+  background: transparent;
+}
+
+:deep(.el-menu-item) {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 5px 10px;
+  border-radius: 8px;
+}
+
+:deep(.el-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+:deep(.el-menu-item.is-active) {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.header {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+}
+
+.header-left h3 {
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+}
+
+.user-info .el-icon {
+  margin: 0 5px;
+}
+
+.main {
+  background: #f5f5f5;
+  padding: 20px;
+}
+</style>

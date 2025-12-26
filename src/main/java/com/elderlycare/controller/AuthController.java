@@ -21,7 +21,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
-        
+
         if (userService.validateUser(username, password)) {
             User user = userService.findByUsername(username);
             Map<String, Object> response = new HashMap<>();
@@ -29,6 +29,7 @@ public class AuthController {
             response.put("message", "登录成功");
             response.put("username", user.getUsername());
             response.put("role", user.getRole());
+            response.put("token", username + "-" + System.currentTimeMillis()); // 简单的 token 生成
             return ResponseEntity.ok(response);
         } else {
             Map<String, Object> response = new HashMap<>();

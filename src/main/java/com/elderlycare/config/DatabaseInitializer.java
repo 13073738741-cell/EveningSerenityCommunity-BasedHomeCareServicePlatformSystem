@@ -42,9 +42,10 @@ public class DatabaseInitializer implements CommandLineRunner {
                 return;
             }
 
-            Integer userCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
-            if (userCount != null && userCount > 0) {
-                System.out.println("数据库已初始化，跳过SQL脚本执行");
+            // 检查老人档案表是否有数据
+            Integer elderlyCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM elderly_info", Integer.class);
+            if (elderlyCount != null && elderlyCount > 0) {
+                System.out.println("老人档案数据已存在，跳过SQL脚本执行");
                 return;
             }
 
