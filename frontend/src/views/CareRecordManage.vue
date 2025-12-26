@@ -176,6 +176,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getCareRecordList, getAllCareRecords, deleteCareRecord } from '../api/careRecord'
 import { getElderlyList } from '../api/elderly'
+import { formatDate, formatDateTime } from '../utils/format'
 
 const router = useRouter()
 const route = useRoute()
@@ -215,20 +216,6 @@ const statistics = ref({
 })
 
 const elderlyMap = ref(new Map())
-
-// 格式化日期
-const formatDate = (date) => {
-  if (!date) return ''
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-// 格式化日期时间
-const formatDateTime = (dateTime) => {
-  if (!dateTime) return ''
-  const d = new Date(dateTime)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
-}
 
 // 获取关爱类型标签类型
 const getCareTypeTagType = (type) => {
@@ -402,18 +389,8 @@ onMounted(() => {
   padding: 20px;
 }
 
-.statistics-card,
-.filter-card,
-.table-card {
-  background: white;
-}
-
 .detail-content {
   max-height: 600px;
   overflow-y: auto;
-}
-
-:deep(.el-descriptions__label) {
-  font-weight: bold;
 }
 </style>

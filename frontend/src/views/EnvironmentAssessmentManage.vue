@@ -189,6 +189,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getEnvironmentAssessmentList, getAllEnvironmentAssessments, deleteEnvironmentAssessment } from '../api/environmentAssessment'
 import { getElderlyList, searchElderly } from '../api/elderly'
+import { formatDate, formatDateTime } from '../utils/format'
 
 const router = useRouter()
 const route = useRoute()
@@ -226,20 +227,6 @@ const statistics = reactive({
 })
 
 const elderlyMap = ref(new Map())
-
-// 格式化日期
-const formatDate = (date) => {
-  if (!date) return ''
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-// 格式化日期时间
-const formatDateTime = (date) => {
-  if (!date) return ''
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-}
 
 // 获取房屋类型文本
 const getHouseTypeText = (type) => {
@@ -465,54 +452,5 @@ onMounted(() => {
 <style scoped>
 .environment-assessment-manage {
   padding: 20px;
-}
-
-.statistics-card,
-.filter-card,
-.table-card {
-  background: white;
-}
-
-.detail-content {
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-/* 地面防滑标签颜色 */
-:deep(.el-tag--success) {
-  background-color: #f0f9ff;
-  border-color: #67c23a;
-  color: #67c23a;
-}
-
-:deep(.el-tag--warning) {
-  background-color: #fdf6ec;
-  border-color: #e6a23c;
-  color: #e6a23c;
-}
-
-:deep(.el-tag--danger) {
-  background-color: #fef0f0;
-  border-color: #f56c6c;
-  color: #f56c6c;
-}
-
-:deep(.el-tag--info) {
-  background-color: #f4f4f5;
-  border-color: #909399;
-  color: #909399;
-}
-
-/* 增强标签视觉效果 */
-:deep(.el-tag) {
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-:deep(.el-tag:hover) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 </style>

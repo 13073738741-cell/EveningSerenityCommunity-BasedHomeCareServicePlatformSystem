@@ -57,9 +57,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="350" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
             <el-dropdown @command="(command) => handleDropdownCommand(command, row)" style="display: inline-block; vertical-align: middle">

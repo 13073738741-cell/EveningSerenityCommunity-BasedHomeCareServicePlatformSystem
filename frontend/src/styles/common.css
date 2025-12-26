@@ -1,0 +1,87 @@
+/* 公共标签样式 */
+:deep(.el-tag--success) {
+  background-color: #f0f9ff;
+  border-color: #67c23a;
+  color: #67c23a;
+}
+
+:deep(.el-tag--warning) {
+  background-color: #fdf6ec;
+  border-color: #e6a23c;
+  color: #e6a23c;
+}
+
+:deep(.el-tag--danger) {
+  background-color: #fef0f0;
+  border-color: #f56c6c;
+  color: #f56c6c;
+}
+
+:deep(.el-tag--info) {
+  background-color: #f4f4f5;
+  border-color: #909399;
+  color: #909399;
+}
+
+/* 增强标签视觉效果 */
+:deep(.el-tag) {
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-tag:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 描述列表标签样式 */
+:deep(.el-descriptions__label) {
+  font-weight: bold;
+}
+
+/* 表格卡片样式 */
+.table-card {
+  background: white;
+}
+
+/* 统计卡片样式 */
+.statistics-card {
+  background: white;
+}
+
+/* 过滤卡片样式 */
+.filter-card {
+  background: white;
+}
+
+/* 详情内容滚动区域 */
+.detail-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* 页面容器样式 */
+.page-container {
+  padding: 20px;
+}
+
+/* 按钮间距 */
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* 表单间距 */
+.form-spacing {
+  margin-bottom: 20px;
+}
+
+/* 加载状态 */
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
