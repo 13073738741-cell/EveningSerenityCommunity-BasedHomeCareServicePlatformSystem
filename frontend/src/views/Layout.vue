@@ -11,10 +11,20 @@
         class="el-menu-vertical"
         router
       >
-        <el-menu-item index="/elderly-manage">
-          <el-icon><User /></el-icon>
-          <span>老人档案管理</span>
-        </el-menu-item>
+        <el-sub-menu index="elderly">
+          <template #title>
+            <el-icon><User /></el-icon>
+            <span>老人档案管理</span>
+          </template>
+          <el-menu-item index="/elderly-manage">
+            <el-icon><User /></el-icon>
+            <span>老人档案列表</span>
+          </el-menu-item>
+          <el-menu-item index="/health-assessment-manage">
+            <el-icon><Document /></el-icon>
+            <span>健康能力档案管理</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     
@@ -129,6 +139,39 @@ const handleCommand = async (command) => {
 :deep(.el-menu-item.is-active) {
   background: rgba(255, 255, 255, 0.2);
   color: white;
+}
+
+:deep(.el-sub-menu) {
+  margin: 5px 10px;
+  border-radius: 8px;
+}
+
+:deep(.el-sub-menu__title) {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+:deep(.el-sub-menu__title:hover) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+:deep(.el-sub-menu.is-opened > .el-sub-menu__title) {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+:deep(.el-menu--inline) {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 5px 10px;
+  padding: 5px 0;
+}
+
+:deep(.el-menu--inline .el-menu-item) {
+  margin: 3px 15px;
+  min-height: 40px;
+  line-height: 40px;
 }
 
 .header {

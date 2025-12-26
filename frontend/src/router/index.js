@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Layout from '../views/Layout.vue'
 import ElderlyManage from '../views/ElderlyManage.vue'
+import HealthAssessment from '../views/HealthAssessment.vue'
+import EnvironmentAssessment from '../views/EnvironmentAssessment.vue'
+import CareRecord from '../views/CareRecord.vue'
+import HealthAssessmentManage from '../views/HealthAssessmentManage.vue'
 
 const routes = [
   {
@@ -18,6 +22,29 @@ const routes = [
         path: 'elderly-manage',
         name: 'ElderlyManage',
         component: ElderlyManage
+      },
+      {
+        path: 'health-assessment-manage',
+        name: 'HealthAssessmentManage',
+        component: HealthAssessmentManage
+      },
+      {
+        path: 'health-assessment/:elderlyId',
+        name: 'HealthAssessment',
+        component: HealthAssessment,
+        props: true
+      },
+      {
+        path: 'environment-assessment/:elderlyId',
+        name: 'EnvironmentAssessment',
+        component: EnvironmentAssessment,
+        props: true
+      },
+      {
+        path: 'care-record/:elderlyId',
+        name: 'CareRecord',
+        component: CareRecord,
+        props: true
       }
     ]
   }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - 桑榆晚情社区居家养老服务平台</title>
+    <title>桑榆晚情社区居家养老服务平台</title>
     <style>
         * {
             margin: 0;
@@ -13,218 +13,51 @@
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
         }
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 50px 40px;
-            max-width: 450px;
-            width: 100%;
+        .container {
             text-align: center;
-        }
-        .logo {
-            font-size: 60px;
-            margin-bottom: 20px;
+            color: white;
+            padding: 40px;
         }
         h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            color: #999;
-            font-size: 14px;
-            margin-bottom: 40px;
-        }
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-            position: relative;
-        }
-        .form-group label {
-            display: block;
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            outline: none;
-        }
-        .form-group input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .form-group input::placeholder {
-            color: #aaa;
-        }
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 43px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #999;
-            user-select: none;
-            transition: color 0.3s;
-        }
-        .password-toggle:hover {
-            color: #667eea;
-        }
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            font-size: 13px;
-        }
-        .remember-me {
-            display: flex;
-            align-items: center;
-            color: #666;
-            cursor: pointer;
-        }
-        .remember-me input {
-            margin-right: 8px;
-            cursor: pointer;
-        }
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-        .login-btn:active {
-            transform: translateY(0);
-        }
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .error-message {
-            color: #f44336;
-            font-size: 14px;
+            font-size: 36px;
             margin-bottom: 20px;
-            display: none;
         }
-        .footer {
-            margin-top: 30px;
-            color: #999;
-            font-size: 12px;
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">🏥</div>
+    <div class="container">
+        <div class="loading"></div>
         <h1>桑榆晚情社区居家养老服务平台</h1>
-        <p class="subtitle">Evening Serenity Community Home Care Service Platform</p>
-        
-        <form id="loginForm">
-            <div class="error-message" id="errorMessage"></div>
-            
-            <div class="form-group">
-                <label for="username">用户名</label>
-                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">密码</label>
-                <input type="password" id="password" name="password" placeholder="请输入密码" required>
-                <span class="password-toggle" id="passwordToggle" onclick="togglePassword()">👁️</span>
-            </div>
-            
-            <div class="form-options">
-                <label class="remember-me">
-                    <input type="checkbox" id="remember">
-                    记住我
-                </label>
-            </div>
-            
-            <button type="submit" class="login-btn" id="loginBtn">登 录</button>
-        </form>
-        
-        <div class="footer">
-            <p>© 2025 桑榆晚情社区居家养老服务平台</p>
-        </div>
+        <p>正在跳转到前端页面，请稍候...</p>
     </div>
-    
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const passwordToggle = document.getElementById('passwordToggle');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                passwordToggle.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                passwordToggle.textContent = '👁️';
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = '登录中...';
-            errorMessage.style.display = 'none';
-            
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('username', data.username);
-                    localStorage.setItem('role', data.role);
-                    window.location.href = '/dashboard.html';
-                } else {
-                    errorMessage.textContent = data.message || '登录失败，请检查用户名和密码';
-                    errorMessage.style.display = 'block';
-                }
-            } catch (error) {
-                errorMessage.textContent = '网络错误，请稍后重试';
-                errorMessage.style.display = 'block';
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.textContent = '登 录';
-            }
-        });
+        // 自动跳转到Vue前端
+        setTimeout(function() {
+            window.location.href = 'http://localhost:3000/';
+        }, 1000);
     </script>
 </body>
 </html>

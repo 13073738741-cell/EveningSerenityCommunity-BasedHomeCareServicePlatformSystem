@@ -38,11 +38,19 @@
         <el-table-column prop="idCard" label="身份证号" width="180" />
         <el-table-column prop="phone" label="联系电话" width="130" />
         <el-table-column prop="address" label="住址" min-width="200" />
-        <el-table-column prop="healthStatus" label="健康状况" width="100">
+        <el-table-column prop="healthStatus" label="健康状况" width="150">
           <template #default="{ row }">
-            <el-tag :type="getHealthStatusType(row.healthStatus)">
-              {{ row.healthStatus }}
-            </el-tag>
+            <div>
+              <el-tag :type="getHealthStatusType(row.healthStatus)" style="margin-bottom: 5px">
+                {{ row.healthStatus }}
+              </el-tag>
+              <div v-if="elderlyAdlMap.has(row.id)" style="font-size: 12px; color: #606266">
+                ADL: <span style="font-weight: bold; color: #409EFF">{{ elderlyAdlMap.get(row.id) }}分</span>
+              </div>
+              <div v-else style="font-size: 12px; color: #909399">
+                未评估
+              </div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="careLevel" label="护理等级" width="100">
@@ -52,11 +60,23 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="350" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <el-dropdown @command="(command) => handleDropdownCommand(command, row)">
+              <el-button type="info" size="small">
+                更多<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="health">健康能力评估</el-dropdown-item>
+                  <el-dropdown-item command="environment">家庭环境评估</el-dropdown-item>
+                  <el-dropdown-item command="care">建立关爱档案</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -172,9 +192,13 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus } from '@element-plus/icons-vue'
+import { Search, Plus, ArrowDown } from '@element-plus/icons-vue'
 import { getElderlyList, createElderly, updateElderly, deleteElderly } from '../api/elderly'
+import { getHealthAssessmentList } from '../api/healthAssessment'
+
+const router = useRouter()
 
 const loading = ref(false)
 const dialogVisible = ref(false)
@@ -192,6 +216,7 @@ const pagination = reactive({
 })
 
 const tableData = ref([])
+const elderlyAdlMap = ref(new Map()) // 存储每个老人的最新ADL分数
 const form = reactive({
   id: null,
   name: '',
@@ -233,10 +258,60 @@ const loadData = async () => {
     const response = await getElderlyList(params)
     tableData.value = response.data || []
     pagination.total = response.total || 0
+    
+    // 加载所有老人的最新ADL分数
+    await loadAllAdlScores()
   } catch (error) {
     ElMessage.error('加载数据失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 加载所有老人的最新ADL分数
+const loadAllAdlScores = async () => {
+  try {
+    elderlyAdlMap.value.clear()
+    
+    // 为每个老人获取最新的健康评估记录
+    for (const elderly of tableData.value) {
+      try {
+        const response = await getHealthAssessmentList(elderly.id, { page: 1, pageSize: 1 })
+        console.log(`老人 ${elderly.name} (ID: ${elderly.id}) 的评估数据:`, response)
+        
+        // 处理响应数据
+        let assessments = response.data || response
+        
+        if (Array.isArray(assessments) && assessments.length > 0) {
+          // 获取最新的评估记录并计算ADL总分
+          const latestAssessment = assessments[0]
+          console.log(`最新评估记录:`, latestAssessment)
+          
+          const adlTotal = (latestAssessment.eating || 0) +
+                          (latestAssessment.bathing || 0) +
+                          (latestAssessment.grooming || 0) +
+                          (latestAssessment.dressing || 0) +
+                          (latestAssessment.bowelControl || 0) +
+                          (latestAssessment.bladderControl || 0) +
+                          (latestAssessment.toilet || 0) +
+                          (latestAssessment.transfer || 0) +
+                          (latestAssessment.walking || 0) +
+                          (latestAssessment.stairs || 0)
+          
+          console.log(`计算得到的ADL总分:`, adlTotal)
+          elderlyAdlMap.value.set(elderly.id, adlTotal)
+        } else {
+          console.log(`老人 ${elderly.name} 没有评估记录`)
+        }
+      } catch (error) {
+        // 如果某个老人没有评估记录，忽略错误
+        console.error(`加载老人 ${elderly.name} 的ADL分数失败`, error)
+      }
+    }
+    
+    console.log('所有老人的ADL分数Map:', elderlyAdlMap.value)
+  } catch (error) {
+    console.error('加载ADL分数失败', error)
   }
 }
 
@@ -253,6 +328,20 @@ const handleAdd = () => {
 
 const handleView = (row) => {
   ElMessage.info('查看功能待实现')
+}
+
+const handleDropdownCommand = (command, row) => {
+  switch (command) {
+    case 'health':
+      router.push({ name: 'HealthAssessment', params: { elderlyId: row.id } })
+      break
+    case 'environment':
+      router.push({ name: 'EnvironmentAssessment', params: { elderlyId: row.id } })
+      break
+    case 'care':
+      router.push({ name: 'CareRecord', params: { elderlyId: row.id } })
+      break
+  }
 }
 
 const handleEdit = (row) => {
