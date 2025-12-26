@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老人档案综合管理 - 桑榆晚情社区居家养老服务平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-name {
+            font-size: 14px;
+        }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .search-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        .search-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            outline: none;
+            cursor: pointer;
+            background-color: white;
+        }
+        .search-select:focus {
+            border-color: #667eea;
+        }
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .search-btn:hover {
+            background: #5568d3;
+        }
+        .reset-btn {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .reset-btn:hover {
+            background: #e8e8e8;
+            border-color: #d0d0d0;
+        }
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        th {
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        td {
+            font-size: 14px;
+            color: #555;
+        }
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+        .view-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .view-btn:hover {
+            background: #45a049;
+        }
+        .edit-btn {
+            background: #2196F3;
+            color: white;
+        }
+        .edit-btn:hover {
+            background: #0b7dda;
+        }
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+        .delete-btn:hover {
+            background: #da190b;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination .active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .pagination-info {
+            font-size: 14px;
+            color: #666;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            transition: background 0.3s;
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .modal-body {
+            padding: 30px;
+        }
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .form-section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .form-group label.required::before {
+            content: '*';
+            color: #e74c3c;
+            margin-right: 4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .search-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏥 桑榆晚情社区居家养老服务平台</h1>
+        <div class="user-info">
+            <span class="user-name">欢迎，<span id="username"></span></span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h2 class="page-title">👴 老人档案综合管理</h2>
+            <div>
+                <a href="/elderly-management.html" class="back-btn">返回上级</a>
+                <button class="add-btn" onclick="openAddModal()">+ 添加档案</button>
+            </div>
+        </div>
+        
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">档案总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="maleCount">0</div>
+                <div class="stat-label">男性老人</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="femaleCount">0</div>
+                <div class="stat-label">女性老人</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="livingAloneCount">0</div>
+                <div class="stat-label">独居老人</div>
+            </div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="输入姓名、身份证号或电话号码搜索...">
+            <select class="search-select" id="genderFilter">
+                <option value="">全部性别</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+            <select class="search-select" id="livingFilter">
+                <option value="">全部居住情况</option>
+                <option value="独居">独居</option>
+                <option value="与配偶同住">与配偶同住</option>
+                <option value="与子女同住">与子女同住</option>
+                <option value="与其他亲属同住">与其他亲属同住</option>
+                <option value="养老院">养老院</option>
+            </select>
+            <button class="search-btn" onclick="searchElderly()">搜索</button>
+            <button class="reset-btn" onclick="resetSearch()">重置</button>
+        </div>
+        
+        <div class="table-container">
+            <table id="elderlyTable">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>性别</th>
+                        <th>出生日期</th>
+                        <th>身份证号</th>
+                        <th>联系电话</th>
+                        <th>居住情况</th>
+                        <th>医疗保险</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="elderlyTableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination" id="pagination">
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">编辑老人档案</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="elderlyForm">
+                    <input type="hidden" id="editId" name="id">
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">基本信息</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required" for="editName">姓名</label>
+                                <input type="text" id="editName" name="name" placeholder="请输入姓名" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="required" for="editGender">性别</label>
+                                <select id="editGender" name="gender" required>
+                                    <option value="">请选择性别</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required" for="editBirthDate">出生日期</label>
+                                <input type="date" id="editBirthDate" name="birthDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editIdCard">身份证号</label>
+                                <input type="text" id="editIdCard" name="idCard" placeholder="请输入身份证号" maxlength="18">
+                                <div class="hint">选填</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">联系方式</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editPhone">联系电话</label>
+                                <input type="tel" id="editPhone" name="phone" placeholder="请输入联系电话" maxlength="11">
+                            </div>
+                            <div class="form-group">
+                                <label for="editAddress">居住地址</label>
+                                <input type="text" id="editAddress" name="address" placeholder="请输入居住地址">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">紧急联系人</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editEmergencyContact">紧急联系人</label>
+                                <input type="text" id="editEmergencyContact" name="emergencyContact" placeholder="请输入紧急联系人姓名">
+                            </div>
+                            <div class="form-group">
+                                <label for="editEmergencyPhone">紧急联系电话</label>
+                                <input type="tel" id="editEmergencyPhone" name="emergencyPhone" placeholder="请输入紧急联系电话" maxlength="11">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">其他信息</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editLivingArrangement">居住情况</label>
+                                <select id="editLivingArrangement" name="livingArrangement">
+                                    <option value="">请选择居住情况</option>
+                                    <option value="独居">独居</option>
+                                    <option value="与配偶同住">与配偶同住</option>
+                                    <option value="与子女同住">与子女同住</option>
+                                    <option value="与其他亲属同住">与其他亲属同住</option>
+                                    <option value="养老院">养老院</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editMedicalInsurance">医疗保险</label>
+                                <select id="editMedicalInsurance" name="medicalInsurance">
+                                    <option value="">请选择医疗保险类型</option>
+                                    <option value="城镇职工基本医疗保险">城镇职工基本医疗保险</option>
+                                    <option value="城乡居民基本医疗保险">城乡居民基本医疗保险</option>
+                                    <option value="公费医疗">公费医疗</option>
+                                    <option value="商业保险">商业保险</option>
+                                    <option value="无">无</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveElderly()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPage = 1;
+        const pageSize = 10;
+        let allElderlyData = [];
+        let filteredData = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+            loadElderlyList();
+        });
+        
+        function checkLogin() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const username = localStorage.getItem('username');
+            
+            if (!isLoggedIn || !username) {
+                window.location.href = '/';
+                return;
+            }
+            
+            document.getElementById('username').textContent = username;
+        }
+        
+        async function loadElderlyList() {
+            const tbody = document.getElementById('elderlyTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+            
+            try {
+                const response = await fetch('/api/elderly');
+                const data = await response.json();
+                
+                allElderlyData = data;
+                filteredData = data;
+                
+                updateStats();
+                renderTable();
+                renderPagination();
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">加载失败，请刷新页面重试</td></tr>';
+            }
+        }
+        
+        function updateStats() {
+            const total = filteredData.length;
+            const male = filteredData.filter(e => e.gender === '男').length;
+            const female = filteredData.filter(e => e.gender === '女').length;
+            const livingAlone = filteredData.filter(e => e.livingArrangement === '独居').length;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('maleCount').textContent = male;
+            document.getElementById('femaleCount').textContent = female;
+            document.getElementById('livingAloneCount').textContent = livingAlone;
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('elderlyTableBody');
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>暂无老人档案</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = pageData.map(elderly => `
+                <tr>
+                    <td>${elderly.name}</td>
+                    <td>${elderly.gender}</td>
+                    <td>${elderly.birthDate}</td>
+                    <td>${elderly.idCard || '-'}</td>
+                    <td>${elderly.phone || '-'}</td>
+                    <td>${elderly.livingArrangement || '-'}</td>
+                    <td>${elderly.medicalInsurance || '-'}</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewElderly(${elderly.id})">查看</button>
+                        <button class="action-btn edit-btn" onclick="openEditModal(${elderly.id})">编辑</button>
+                        <button class="action-btn delete-btn" onclick="deleteElderly(${elderly.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = `
+                <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">上一页</button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            html += `
+                <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">下一页</button>
+                <span class="pagination-info">共 ${filteredData.length} 条记录，第 ${currentPage}/${totalPages} 页</span>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+        
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+            renderPagination();
+        }
+        
+        function searchElderly() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const genderFilter = document.getElementById('genderFilter').value;
+            const livingFilter = document.getElementById('livingFilter').value;
+            
+            filteredData = allElderlyData.filter(elderly => {
+                const matchSearch = !searchTerm || 
+                    elderly.name.toLowerCase().includes(searchTerm) ||
+                    (elderly.idCard && elderly.idCard.toLowerCase().includes(searchTerm)) ||
+                    (elderly.phone && elderly.phone.includes(searchTerm));
+                
+                const matchGender = !genderFilter || elderly.gender === genderFilter;
+                const matchLiving = !livingFilter || elderly.livingArrangement === livingFilter;
+                
+                return matchSearch && matchGender && matchLiving;
+            });
+            
+            currentPage = 1;
+            updateStats();
+            renderTable();
+            renderPagination();
+        }
+        
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('genderFilter').value = '';
+            document.getElementById('livingFilter').value = '';
+            filteredData = allElderlyData;
+            currentPage = 1;
+            updateStats();
+            renderTable();
+            renderPagination();
+        }
+        
+        function openEditModal(id) {
+            const elderly = allElderlyData.find(e => e.id === id);
+            if (!elderly) return;
+            
+            document.getElementById('modalTitle').textContent = '编辑老人档案';
+            document.getElementById('editId').value = elderly.id;
+            document.getElementById('editName').value = elderly.name || '';
+            document.getElementById('editGender').value = elderly.gender || '';
+            document.getElementById('editBirthDate').value = elderly.birthDate || '';
+            document.getElementById('editIdCard').value = elderly.idCard || '';
+            document.getElementById('editPhone').value = elderly.phone || '';
+            document.getElementById('editAddress').value = elderly.address || '';
+            document.getElementById('editEmergencyContact').value = elderly.emergencyContact || '';
+            document.getElementById('editEmergencyPhone').value = elderly.emergencyPhone || '';
+            document.getElementById('editLivingArrangement').value = elderly.livingArrangement || '';
+            document.getElementById('editMedicalInsurance').value = elderly.medicalInsurance || '';
+            
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = '添加老人档案';
+            document.getElementById('elderlyForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('show');
+        }
+        
+        async function saveElderly() {
+            const form = document.getElementById('elderlyForm');
+            const id = document.getElementById('editId').value;
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = {
+                name: document.getElementById('editName').value,
+                gender: document.getElementById('editGender').value,
+                birthDate: document.getElementById('editBirthDate').value,
+                idCard: document.getElementById('editIdCard').value,
+                phone: document.getElementById('editPhone').value,
+                address: document.getElementById('editAddress').value,
+                emergencyContact: document.getElementById('editEmergencyContact').value,
+                emergencyPhone: document.getElementById('editEmergencyPhone').value,
+                livingArrangement: document.getElementById('editLivingArrangement').value,
+                medicalInsurance: document.getElementById('editMedicalInsurance').value
+            };
+            
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`/api/elderly/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    response = await fetch('/api/elderly', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                }
+                
+                if (response.ok) {
+                    alert(id ? '更新成功' : '添加成功');
+                    closeModal();
+                    loadElderlyList();
+                } else {
+                    alert('操作失败，请重试');
+                }
+            } catch (error) {
+                alert('操作失败，请检查网络连接');
+            }
+        }
+        
+        function viewElderly(id) {
+            window.location.href = `/elderly-view.html?id=${id}`;
+        }
+        
+        async function deleteElderly(id) {
+            if (!confirm('确定要删除这条档案吗？此操作不可恢复。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/elderly/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('删除成功');
+                    loadElderlyList();
+                } else {
+                    alert('删除失败，请重试');
+                }
+            } catch (error) {
+                alert('删除失败，请检查网络连接');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            window.location.href = '/';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
