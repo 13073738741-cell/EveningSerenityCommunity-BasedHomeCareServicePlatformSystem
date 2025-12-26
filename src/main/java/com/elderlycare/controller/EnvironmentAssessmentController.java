@@ -1,5 +1,6 @@
 package com.elderlycare.controller;
 
+import com.elderlycare.dto.ApiResponse;
 import com.elderlycare.entity.EnvironmentAssessment;
 import com.elderlycare.service.EnvironmentAssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,73 @@ public class EnvironmentAssessmentController {
     }
     
     @GetMapping
-    public ResponseEntity<List<EnvironmentAssessment>> getAllEnvironmentAssessments() {
-        List<EnvironmentAssessment> assessments = environmentAssessmentService.findAll();
-        return new ResponseEntity<>(assessments, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<List<EnvironmentAssessment>>> getAllEnvironmentAssessments(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) Long elderlyId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        List<EnvironmentAssessment> allAssessments = environmentAssessmentService.findAll();
+        
+        // Apply filters
+        if (elderlyId != null) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getElderlyId() != null && 
+                            assessment.getElderlyId().equals(elderlyId))
+                    .toList();
+        }
+        
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getAssessmentDate() != null && 
+                            assessment.getAssessmentDate().compareTo(startDate) >= 0)
+                    .toList();
+        }
+        
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getAssessmentDate() != null && 
+                            assessment.getAssessmentDate().compareTo(endDate) <= 0)
+                    .toList();
+        }
+        
+        // Apply pagination
+        int total = allAssessments.size();
+        if (page != null && pageSize != null && page > 0 && pageSize > 0) {
+            int startIndex = (page - 1) * pageSize;
+            if (startIndex < allAssessments.size()) {
+                int endIndex = Math.min(startIndex + pageSize, allAssessments.size());
+                allAssessments = allAssessments.subList(startIndex, endIndex);
+            } else {
+                allAssessments = List.of();
+            }
+        }
+        
+        ApiResponse<List<EnvironmentAssessment>> response = ApiResponse.success(allAssessments, total);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping("/elderly/{elderlyId}")
-    public ResponseEntity<List<EnvironmentAssessment>> getEnvironmentAssessmentsByElderlyId(@PathVariable Long elderlyId) {
+    public ResponseEntity<ApiResponse<List<EnvironmentAssessment>>> getEnvironmentAssessmentsByElderlyId(
+            @PathVariable Long elderlyId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
         List<EnvironmentAssessment> assessments = environmentAssessmentService.findByElderlyId(elderlyId);
-        return new ResponseEntity<>(assessments, HttpStatus.OK);
+        
+        // 实现简单的分页逻辑
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, assessments.size());
+        
+        List<EnvironmentAssessment> pagedAssessments = assessments;
+        if (fromIndex < assessments.size()) {
+            pagedAssessments = assessments.subList(fromIndex, toIndex);
+        } else {
+            pagedAssessments = new java.util.ArrayList<>();
+        }
+        
+        ApiResponse<List<EnvironmentAssessment>> response = ApiResponse.success(pagedAssessments, assessments.size());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @PutMapping("/{id}")

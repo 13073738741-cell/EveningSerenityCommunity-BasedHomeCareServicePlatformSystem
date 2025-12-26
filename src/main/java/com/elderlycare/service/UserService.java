@@ -30,8 +30,22 @@ public class UserService {
             admin.setUsername("admin");
             admin.setPassword("111111");
             admin.setRole("ADMIN");
+            admin.setRealName("管理员");
             return userRepository.save(admin);
         }
         return findByUsername("admin");
+    }
+    
+    public User updateRealName(String username, String realName) {
+        User user = findByUsername(username);
+        if (user != null) {
+            user.setRealName(realName);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+    
+    public User getUserInfo(String username) {
+        return findByUsername(username);
     }
 }

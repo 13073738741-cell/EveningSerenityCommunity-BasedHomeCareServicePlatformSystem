@@ -1,5 +1,14 @@
 import request from '../utils/request'
 
+// 获取所有环境评估列表
+export const getAllEnvironmentAssessments = (params) => {
+  return request({
+    url: '/environment-assessments',
+    method: 'get',
+    params
+  })
+}
+
 // 获取老人的环境评估列表
 export const getEnvironmentAssessmentList = (elderlyId, params) => {
   return request({

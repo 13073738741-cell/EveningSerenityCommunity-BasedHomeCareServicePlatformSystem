@@ -1,5 +1,6 @@
 package com.elderlycare.controller;
 
+import com.elderlycare.dto.ApiResponse;
 import com.elderlycare.entity.HealthAssessment;
 import com.elderlycare.service.HealthAssessmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,59 @@ public class HealthAssessmentController {
     }
     
     @GetMapping
-    public ResponseEntity<List<HealthAssessment>> getAllHealthAssessments() {
-        List<HealthAssessment> assessments = healthAssessmentService.findAll();
-        return new ResponseEntity<>(assessments, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<List<HealthAssessment>>> getAllHealthAssessments(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) Long elderlyId,
+            @RequestParam(required = false) String overallResult,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        List<HealthAssessment> allAssessments = healthAssessmentService.findAll();
+        
+        // Apply filters
+        if (elderlyId != null) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getElderlyId() != null && 
+                            assessment.getElderlyId().equals(elderlyId))
+                    .toList();
+        }
+        
+        if (overallResult != null && !overallResult.trim().isEmpty()) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getOverallResult() != null && 
+                            assessment.getOverallResult().contains(overallResult))
+                    .toList();
+        }
+        
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getAssessmentDate() != null && 
+                            assessment.getAssessmentDate().compareTo(startDate) >= 0)
+                    .toList();
+        }
+        
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            allAssessments = allAssessments.stream()
+                    .filter(assessment -> assessment.getAssessmentDate() != null && 
+                            assessment.getAssessmentDate().compareTo(endDate) <= 0)
+                    .toList();
+        }
+        
+        // Apply pagination
+        int total = allAssessments.size();
+        if (page != null && pageSize != null && page > 0 && pageSize > 0) {
+            int startIndex = (page - 1) * pageSize;
+            if (startIndex < allAssessments.size()) {
+                int endIndex = Math.min(startIndex + pageSize, allAssessments.size());
+                allAssessments = allAssessments.subList(startIndex, endIndex);
+            } else {
+                allAssessments = List.of();
+            }
+        }
+        
+        ApiResponse<List<HealthAssessment>> response = ApiResponse.success(allAssessments, total);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping("/elderly/{elderlyId}")

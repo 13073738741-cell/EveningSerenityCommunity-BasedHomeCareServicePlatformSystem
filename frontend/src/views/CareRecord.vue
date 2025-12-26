@@ -1,306 +1,279 @@
 <template>
   <div class="care-record">
-    <el-page-header @back="goBack" :content="`关爱档案 - ${elderlyName}`" />
+    <el-page-header @back="goBack" :content="`关爱档案记录 - ${elderlyName}`" />
     
     <el-card class="record-card" style="margin-top: 20px">
-      <el-tabs v-model="activeTab" type="border-card">
-        <el-tab-pane label="关爱记录列表" name="list">
-          <div class="toolbar">
-            <el-button type="primary" @click="showAddDialog">
-              <el-icon><Plus /></el-icon>
-              新增关爱记录
-            </el-button>
-            <el-input
-              v-model="searchKeyword"
-              placeholder="搜索记录"
-              style="width: 300px; margin-left: 20px"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </div>
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="150px">
+        <el-divider content-position="left">基本信息</el-divider>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="关爱日期" prop="careDate">
+              <el-date-picker
+                v-model="form.careDate"
+                type="date"
+                placeholder="选择关爱日期"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="护理员姓名" prop="caregiverName">
+              <el-input v-model="form.caregiverName" placeholder="请输入护理员姓名" disabled />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-          <el-table :data="filteredRecords" stripe style="width: 100%; margin-top: 20px">
-            <el-table-column prop="date" label="日期" width="120" />
-            <el-table-column prop="type" label="关爱类型" width="120">
-              <template #default="{ row }">
-                <el-tag :type="getTypeTagType(row.type)">{{ getTypeLabel(row.type) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="content" label="关爱内容" min-width="200" show-overflow-tooltip />
-            <el-table-column prop="caregiver" label="关爱人员" width="120" />
-            <el-table-column prop="status" label="状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="row.status === 'completed' ? 'success' : 'warning'">
-                  {{ row.status === 'completed' ? '已完成' : '进行中' }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="200" fixed="right">
-              <template #default="{ row }">
-                <el-button link type="primary" @click="viewRecord(row)">查看</el-button>
-                <el-button link type="primary" @click="editRecord(row)">编辑</el-button>
-                <el-button link type="danger" @click="deleteRecord(row)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            :total="total"
-            layout="total, sizes, prev, pager, next, jumper"
-            style="margin-top: 20px; justify-content: flex-end"
-          />
-        </el-tab-pane>
-
-        <el-tab-pane label="关爱统计" name="statistics">
-          <el-row :gutter="20">
-            <el-col :span="6">
-              <el-card class="stat-card">
-                <el-statistic title="总关爱次数" :value="statistics.total" />
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card class="stat-card">
-                <el-statistic title="本月关爱次数" :value="statistics.thisMonth" />
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card class="stat-card">
-                <el-statistic title="完成率" :value="statistics.completionRate" suffix="%" />
-              </el-card>
-            </el-col>
-            <el-col :span="6">
-              <el-card class="stat-card">
-                <el-statistic title="待处理" :value="statistics.pending" />
-              </el-card>
-            </el-col>
-          </el-row>
-
-          <el-card style="margin-top: 20px">
-            <template #header>
-              <div class="card-header">
-                <span>关爱类型分布</span>
-              </div>
-            </template>
-            <div class="type-distribution">
-              <div v-for="(count, type) in typeDistribution" :key="type" class="type-item">
-                <el-tag :type="getTypeTagType(type)">{{ getTypeLabel(type) }}</el-tag>
-                <span class="count">{{ count }} 次</span>
-              </div>
-            </div>
-          </el-card>
-        </el-tab-pane>
-      </el-tabs>
-    </el-card>
-
-    <!-- 新增/编辑对话框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEdit ? '编辑关爱记录' : '新增关爱记录'"
-      width="700px"
-    >
-      <el-form :model="recordForm" :rules="recordRules" ref="recordFormRef" label-width="120px">
-        <el-form-item label="日期" prop="date">
-          <el-date-picker
-            v-model="recordForm.date"
-            type="date"
-            placeholder="选择日期"
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="关爱类型" prop="careType">
+          <el-select
+            v-model="form.careType"
+            placeholder="请选择关爱类型"
             style="width: 100%"
-          />
-        </el-form-item>
-        
-        <el-form-item label="关爱类型" prop="type">
-          <el-select v-model="recordForm.type" placeholder="请选择关爱类型" style="width: 100%">
-            <el-option label="电话慰问" value="phone" />
-            <el-option label="上门探访" value="visit" />
-            <el-option label="生活照料" value="daily_care" />
-            <el-option label="医疗护理" value="medical_care" />
-            <el-option label="心理疏导" value="psychological" />
-            <el-option label="节日慰问" value="holiday" />
-            <el-option label="其他" value="other" />
+          >
+            <el-option label="电话关怀" value="电话关怀" />
+            <el-option label="上门探访" value="上门探访" />
+            <el-option label="节日慰问" value="节日慰问" />
+            <el-option label="就医陪同" value="就医陪同" />
+            <el-option label="应急探访" value="应急探访" />
           </el-select>
         </el-form-item>
-        
-        <el-form-item label="关爱人员" prop="caregiver">
-          <el-input v-model="recordForm.caregiver" placeholder="请输入关爱人员姓名" />
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="护理等级" prop="careLevel">
+              <el-select v-model="form.careLevel" placeholder="请选择护理等级" style="width: 100%">
+                <el-option label="一级护理" value="一级护理" />
+                <el-option label="二级护理" value="二级护理" />
+                <el-option label="三级护理" value="三级护理" />
+                <el-option label="特级护理" value="特级护理" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="关爱时长" prop="careDuration">
+              <el-input-number
+                v-model="form.careDuration"
+                :min="0"
+                :max="24"
+                :precision="1"
+                :step="0.5"
+                placeholder="关爱时长(小时)"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-divider content-position="left">生活照料</el-divider>
+        <el-form-item label="生活照料项目" prop="lifeCareItems">
+          <el-checkbox-group v-model="form.lifeCareItems">
+            <el-checkbox label="协助进食" />
+            <el-checkbox label="协助洗澡" />
+            <el-checkbox label="协助穿衣" />
+            <el-checkbox label="协助如厕" />
+            <el-checkbox label="协助翻身" />
+            <el-checkbox label="协助行走" />
+            <el-checkbox label="清洁护理" />
+            <el-checkbox label="其他" />
+          </el-checkbox-group>
         </el-form-item>
-        
-        <el-form-item label="关爱内容" prop="content">
+
+        <el-form-item label="生活照料记录" prop="lifeCareRecord">
           <el-input
-            v-model="recordForm.content"
-            type="textarea"
-            :rows="4"
-            placeholder="请详细描述关爱内容"
-          />
-        </el-form-item>
-        
-        <el-form-item label="关爱时长" prop="duration">
-          <el-input v-model="recordForm.duration" placeholder="请输入关爱时长（分钟）">
-            <template #append>分钟</template>
-          </el-input>
-        </el-form-item>
-        
-        <el-form-item label="老人反馈" prop="feedback">
-          <el-input
-            v-model="recordForm.feedback"
+            v-model="form.lifeCareRecord"
             type="textarea"
             :rows="3"
-            placeholder="请记录老人的反馈"
+            placeholder="请详细记录生活照料情况"
           />
         </el-form-item>
-        
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="recordForm.status">
-            <el-radio label="completed">已完成</el-radio>
-            <el-radio label="pending">进行中</el-radio>
-          </el-radio-group>
+
+        <el-divider content-position="left">健康监测</el-divider>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="血压" prop="bloodPressure">
+              <el-input v-model="form.bloodPressure" placeholder="例如: 120/80" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="心率" prop="heartRate">
+              <el-input-number
+                v-model="form.heartRate"
+                :min="0"
+                :max="200"
+                placeholder="心率(次/分)"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="体温" prop="temperature">
+              <el-input-number
+                v-model="form.temperature"
+                :min="30"
+                :max="45"
+                :precision="1"
+                :step="0.1"
+                placeholder="体温(℃)"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="血糖" prop="bloodSugar">
+              <el-input-number
+                v-model="form.bloodSugar"
+                :min="0"
+                :max="30"
+                :precision="1"
+                :step="0.1"
+                placeholder="血糖(mmol/L)"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="用药情况" prop="medication">
+              <el-input v-model="form.medication" placeholder="请记录用药情况" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="健康监测记录" prop="healthMonitorRecord">
+          <el-input
+            v-model="form.healthMonitorRecord"
+            type="textarea"
+            :rows="3"
+            placeholder="请详细记录健康监测情况"
+          />
         </el-form-item>
-        
+
+        <el-divider content-position="left">心理关怀</el-divider>
+        <el-form-item label="心理状态" prop="mentalState">
+          <el-select v-model="form.mentalState" placeholder="请选择心理状态" style="width: 100%">
+            <el-option label="情绪稳定" value="情绪稳定" />
+            <el-option label="情绪良好" value="情绪良好" />
+            <el-option label="情绪一般" value="情绪一般" />
+            <el-option label="情绪低落" value="情绪低落" />
+            <el-option label="情绪激动" value="情绪激动" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="心理关怀内容" prop="mentalCareContent">
+          <el-checkbox-group v-model="form.mentalCareContent">
+            <el-checkbox label="陪伴聊天" />
+            <el-checkbox label="倾听倾诉" />
+            <el-checkbox label="心理疏导" />
+            <el-checkbox label="情感支持" />
+            <el-checkbox label="娱乐活动" />
+            <el-checkbox label="其他" />
+          </el-checkbox-group>
+        </el-form-item>
+
+        <el-form-item label="心理关怀记录" prop="mentalCareRecord">
+          <el-input
+            v-model="form.mentalCareRecord"
+            type="textarea"
+            :rows="3"
+            placeholder="请详细记录心理关怀情况"
+          />
+        </el-form-item>
+
+        <el-divider content-position="left">关爱总结</el-divider>
+        <el-form-item label="关爱效果" prop="careEffect">
+          <el-select v-model="form.careEffect" placeholder="请选择关爱效果" style="width: 100%">
+            <el-option label="效果良好" value="效果良好" />
+            <el-option label="效果较好" value="效果较好" />
+            <el-option label="效果一般" value="效果一般" />
+            <el-option label="效果较差" value="效果较差" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="关爱总结" prop="careSummary">
+          <el-input
+            v-model="form.careSummary"
+            type="textarea"
+            :rows="5"
+            placeholder="请总结本次关爱情况"
+          />
+        </el-form-item>
+
         <el-form-item label="备注" prop="notes">
           <el-input
-            v-model="recordForm.notes"
+            v-model="form.notes"
             type="textarea"
-            :rows="2"
+            :rows="3"
             placeholder="请输入备注信息"
           />
         </el-form-item>
-      </el-form>
-      
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSave" :loading="saving">保存</el-button>
-      </template>
-    </el-dialog>
 
-    <!-- 查看对话框 -->
-    <el-dialog v-model="viewDialogVisible" title="关爱记录详情" width="700px">
-      <el-descriptions :column="1" border>
-        <el-descriptions-item label="日期">{{ viewRecord.date }}</el-descriptions-item>
-        <el-descriptions-item label="关爱类型">
-          <el-tag :type="getTypeTagType(viewRecord.type)">{{ getTypeLabel(viewRecord.type) }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="关爱人员">{{ viewRecord.caregiver }}</el-descriptions-item>
-        <el-descriptions-item label="关爱内容">{{ viewRecord.content }}</el-descriptions-item>
-        <el-descriptions-item label="关爱时长">{{ viewRecord.duration }} 分钟</el-descriptions-item>
-        <el-descriptions-item label="老人反馈">{{ viewRecord.feedback }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
-          <el-tag :type="viewRecord.status === 'completed' ? 'success' : 'warning'">
-            {{ viewRecord.status === 'completed' ? '已完成' : '进行中' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="备注">{{ viewRecord.notes }}</el-descriptions-item>
-      </el-descriptions>
-      
-      <template #footer>
-        <el-button @click="viewDialogVisible = false">关闭</el-button>
-      </template>
-    </el-dialog>
+        <el-form-item>
+          <el-button type="primary" @click="handleSubmit" :loading="loading">保存记录</el-button>
+          <el-button @click="goBack">返回</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { getElderlyById } from '../api/elderly'
-import { getCareRecordList, createCareRecord, updateCareRecord, deleteCareRecord } from '../api/careRecord'
+import { createCareRecord, updateCareRecord, getCareRecordById } from '../api/careRecord'
+import { getUserInfo } from '../api/auth'
 
 const router = useRouter()
 const route = useRoute()
-const recordFormRef = ref(null)
-const activeTab = ref('list')
-const dialogVisible = ref(false)
-const viewDialogVisible = ref(false)
-const isEdit = ref(false)
-const saving = ref(false)
-const searchKeyword = ref('')
+const formRef = ref(null)
+const loading = ref(false)
 const elderlyName = ref('')
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
+const existingRecordId = ref(null)
 
-const recordForm = reactive({
-  id: null,
+const form = reactive({
   elderlyId: route.params.elderlyId,
-  date: new Date(),
-  type: 'phone',
-  caregiver: '',
-  content: '',
-  duration: '',
-  feedback: '',
-  status: 'completed',
+  careDate: new Date(),
+  caregiverName: '',
+  careType: '上门探访',
+  careLevel: '二级护理',
+  careDuration: 2,
+  lifeCareItems: [],
+  lifeCareRecord: '',
+  bloodPressure: '',
+  heartRate: null,
+  temperature: null,
+  bloodSugar: null,
+  medication: '',
+  healthMonitorRecord: '',
+  mentalState: '情绪稳定',
+  mentalCareContent: [],
+  mentalCareRecord: '',
+  careEffect: '效果良好',
+  careSummary: '',
   notes: ''
 })
 
-const recordRules = {
-  date: [{ required: true, message: '请选择日期', trigger: 'change' }],
-  type: [{ required: true, message: '请选择关爱类型', trigger: 'change' }],
-  caregiver: [{ required: true, message: '请输入关爱人员姓名', trigger: 'blur' }],
-  content: [{ required: true, message: '请输入关爱内容', trigger: 'blur' }]
-}
-
-const viewRecord = ref({})
-const records = ref([])
-
-const statistics = reactive({
-  total: 0,
-  thisMonth: 0,
-  completionRate: 0,
-  pending: 0
-})
-
-const typeDistribution = computed(() => {
-  const distribution = {}
-  records.value.forEach(record => {
-    distribution[record.type] = (distribution[record.type] || 0) + 1
-  })
-  return distribution
-})
-
-const filteredRecords = computed(() => {
-  if (!searchKeyword.value) {
-    return records.value
-  }
-  const keyword = searchKeyword.value.toLowerCase()
-  return records.value.filter(record =>
-    record.content.toLowerCase().includes(keyword) ||
-    record.caregiver.toLowerCase().includes(keyword)
-  )
-})
-
-const getTypeLabel = (type) => {
-  const typeMap = {
-    phone: '电话慰问',
-    visit: '上门探访',
-    daily_care: '生活照料',
-    medical_care: '医疗护理',
-    psychological: '心理疏导',
-    holiday: '节日慰问',
-    other: '其他'
-  }
-  return typeMap[type] || type
-}
-
-const getTypeTagType = (type) => {
-  const typeMap = {
-    phone: 'info',
-    visit: 'success',
-    daily_care: 'warning',
-    medical_care: 'danger',
-    psychological: 'primary',
-    holiday: 'success',
-    other: 'info'
-  }
-  return typeMap[type] || 'info'
+const rules = {
+  careDate: [{ required: true, message: '请选择关爱日期', trigger: 'change' }],
+  caregiverName: [{ required: true, message: '请输入护理员姓名', trigger: 'blur' }],
+  careType: [{ required: true, message: '请选择关爱类型', trigger: 'change' }],
+  careLevel: [{ required: true, message: '请选择护理等级', trigger: 'change' }],
+  careDuration: [{ required: true, message: '请输入关爱时长', trigger: 'blur' }],
+  careEffect: [{ required: true, message: '请选择关爱效果', trigger: 'change' }]
 }
 
 const loadElderlyInfo = async () => {
+  if (!route.params.elderlyId || route.params.elderlyId === 'undefined') {
+    ElMessage.error('缺少老人ID参数')
+    router.back()
+    return
+  }
   try {
     const response = await getElderlyById(route.params.elderlyId)
     elderlyName.value = response.data?.name || response.name || ''
@@ -309,103 +282,72 @@ const loadElderlyInfo = async () => {
   }
 }
 
-const loadRecords = async () => {
+const loadUserInfo = async () => {
   try {
-    const response = await getCareRecordList(route.params.elderlyId, {
-      page: currentPage.value,
-      pageSize: pageSize.value
-    })
-    records.value = response.data || response
-    total.value = response.total || records.value.length
-    updateStatistics()
+    const response = await getUserInfo()
+    if (response.success) {
+      form.caregiverName = response.realName || response.username
+    }
   } catch (error) {
-    ElMessage.error('加载关爱记录失败')
+    console.error('获取用户信息失败:', error)
   }
 }
 
-const updateStatistics = () => {
-  statistics.total = records.value.length
-  const thisMonth = new Date().getMonth()
-  statistics.thisMonth = records.value.filter(record => {
-    const recordDate = new Date(record.date)
-    return recordDate.getMonth() === thisMonth
-  }).length
-  
-  const completedCount = records.value.filter(record => record.status === 'completed').length
-  statistics.completionRate = statistics.total > 0 
-    ? Math.round((completedCount / statistics.total) * 100) 
-    : 0
-  statistics.pending = records.value.filter(record => record.status === 'pending').length
+const loadCareRecord = async (recordId) => {
+  loading.value = true
+  try {
+    const response = await getCareRecordById(recordId)
+    if (response) {
+      existingRecordId.value = response.id
+      
+      const data = { ...response }
+      if (data.lifeCareItems && typeof data.lifeCareItems === 'string') {
+        data.lifeCareItems = data.lifeCareItems.split(',').map(d => d.trim()).filter(d => d)
+      }
+      if (data.mentalCareContent && typeof data.mentalCareContent === 'string') {
+        data.mentalCareContent = data.mentalCareContent.split(',').map(d => d.trim()).filter(d => d)
+      }
+      Object.assign(form, data)
+      
+      await loadUserInfo()
+    }
+  } catch (error) {
+    console.error('加载关爱记录失败:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
-const showAddDialog = () => {
-  isEdit.value = false
-  Object.assign(recordForm, {
-    id: null,
-    elderlyId: route.params.elderlyId,
-    date: new Date(),
-    type: 'phone',
-    caregiver: '',
-    content: '',
-    duration: '',
-    feedback: '',
-    status: 'completed',
-    notes: ''
-  })
-  dialogVisible.value = true
-}
+const handleSubmit = async () => {
+  if (!formRef.value) return
 
-const editRecord = (row) => {
-  isEdit.value = true
-  Object.assign(recordForm, row)
-  dialogVisible.value = true
-}
-
-const viewRecordDetail = (row) => {
-  viewRecord.value = row
-  viewDialogVisible.value = true
-}
-
-const handleSave = async () => {
-  if (!recordFormRef.value) return
-  
-  await recordFormRef.value.validate(async (valid) => {
+  await formRef.value.validate(async (valid) => {
     if (valid) {
-      saving.value = true
+      loading.value = true
       try {
-        if (isEdit.value) {
-          await updateCareRecord(recordForm.id, recordForm)
+        const submitData = {
+        ...form,
+        elderlyName: elderlyName.value,
+        careContent: `关爱类型：${form.careType}，护理等级：${form.careLevel}，关爱时长：${form.careDuration}小时，生活照料：${Array.isArray(form.lifeCareItems) ? form.lifeCareItems.join('、') : form.lifeCareItems}`,
+        lifeCareItems: Array.isArray(form.lifeCareItems) ? form.lifeCareItems.join(',') : form.lifeCareItems,
+        mentalCareContent: Array.isArray(form.mentalCareContent) ? form.mentalCareContent.join(',') : form.mentalCareContent
+      }
+
+        if (existingRecordId.value) {
+          await updateCareRecord(existingRecordId.value, submitData)
         } else {
-          await createCareRecord(recordForm)
+          await createCareRecord(submitData)
         }
-        ElMessage.success(isEdit.value ? '更新成功' : '新增成功')
-        dialogVisible.value = false
-        loadRecords()
+        ElMessage.success('保存成功')
+        goBack()
       } catch (error) {
+        console.error('保存失败:', error)
         ElMessage.error('保存失败')
       } finally {
-        saving.value = false
+        loading.value = false
       }
     }
   })
-}
-
-const deleteRecord = async (row) => {
-  try {
-    await ElMessageBox.confirm('确定要删除这条关爱记录吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    
-    await deleteCareRecord(row.id)
-    ElMessage.success('删除成功')
-    loadRecords()
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('删除失败')
-    }
-  }
 }
 
 const goBack = () => {
@@ -414,7 +356,11 @@ const goBack = () => {
 
 onMounted(() => {
   loadElderlyInfo()
-  loadRecords()
+  loadUserInfo()
+  
+  if (route.params.id) {
+    loadCareRecord(route.params.id)
+  }
 })
 </script>
 
@@ -425,31 +371,5 @@ onMounted(() => {
 
 .record-card {
   background: white;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-}
-
-.stat-card {
-  text-align: center;
-}
-
-.type-distribution {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.type-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.type-item .count {
-  font-weight: bold;
-  color: #409eff;
 }
 </style>

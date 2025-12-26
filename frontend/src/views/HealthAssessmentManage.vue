@@ -71,7 +71,7 @@
             {{ formatDate(row.assessmentDate) }}
           </template>
         </el-table-column>
-        <el-table-column prop="assessor" label="评估人" width="100" />
+        <el-table-column prop="assessorName" label="评估人" width="100" />
         <el-table-column label="ADL总分" width="100">
           <template #default="{ row }">
             <el-tag :type="getAdlTagType(row.adlTotal)">{{ row.adlTotal }}分</el-tag>
@@ -150,7 +150,7 @@
             {{ formatDate(currentAssessment.assessmentDate) }}
           </el-descriptions-item>
           <el-descriptions-item label="评估人">
-            {{ currentAssessment.assessor }}
+            {{ currentAssessment.assessorName }}
           </el-descriptions-item>
           <el-descriptions-item label="ADL总分">
             <el-tag :type="getAdlTagType(currentAssessment.adlTotal)">
@@ -257,7 +257,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getHealthAssessmentList, getAllHealthAssessments, deleteHealthAssessment } from '../api/healthAssessment'
-import { getElderlyList } from '../api/elderly'
+import { getElderlyList, searchElderly } from '../api/elderly'
 
 const router = useRouter()
 const route = useRoute()
@@ -426,17 +426,36 @@ const loadAssessments = async () => {
     let response
     
     // 如果是从老人档案管理页面跳转过来，使用指定老人的API
-    if (isFromElderlyManage.value && route.query.elderlyId) {
+    if (isFromElderlyManage.value && route.query.elderlyId && route.query.elderlyId !== 'undefined') {
       response = await getHealthAssessmentList(route.query.elderlyId, {
         page: currentPage.value,
         pageSize: pageSize.value
       })
     } else {
-      // 否则获取所有评估记录
-      response = await getAllHealthAssessments({
+      // 否则获取所有评估记录，传递分页和过滤参数
+      const params = {
         page: currentPage.value,
         pageSize: pageSize.value
-      })
+      }
+      
+      // 添加过滤参数
+      if (filterForm.elderlyName) {
+        // 根据姓名搜索老人ID
+        const elderlyResponse = await searchElderly({ name: filterForm.elderlyName })
+        const elderlyList = elderlyResponse.data || elderlyResponse
+        if (elderlyList && elderlyList.length > 0) {
+          params.elderlyId = elderlyList[0].id
+        }
+      }
+      if (filterForm.overallResult) {
+        params.overallResult = filterForm.overallResult
+      }
+      if (filterForm.dateRange && filterForm.dateRange.length === 2) {
+        params.startDate = filterForm.dateRange[0]
+        params.endDate = filterForm.dateRange[1]
+      }
+      
+      response = await getAllHealthAssessments(params)
     }
     
     let assessments = response.data || response
@@ -460,27 +479,6 @@ const loadAssessments = async () => {
     // 如果是从老人档案管理页面跳转过来，设置老人姓名
     if (isFromElderlyManage.value && route.query.elderlyName) {
       filterForm.elderlyName = route.query.elderlyName
-    }
-    
-    // 过滤
-    if (filterForm.elderlyName && !isFromElderlyManage.value) {
-      assessments = assessments.filter(a => 
-        a.elderlyName.includes(filterForm.elderlyName)
-      )
-    }
-    
-    if (filterForm.dateRange && filterForm.dateRange.length === 2) {
-      const [start, end] = filterForm.dateRange
-      assessments = assessments.filter(a => {
-        const date = formatDate(a.assessmentDate)
-        return date >= start && date <= end
-      })
-    }
-    
-    if (filterForm.overallResult) {
-      assessments = assessments.filter(a => 
-        a.overallResult === filterForm.overallResult
-      )
     }
     
     tableData.value = assessments
@@ -601,3 +599,4 @@ onMounted(() => {
   font-weight: bold;
 }
 </style>
+

@@ -94,6 +94,7 @@ const handleLogin = async () => {
           localStorage.setItem('token', response.token)
           localStorage.setItem('username', response.username)
           localStorage.setItem('role', response.role)
+          localStorage.setItem('realName', response.realName || response.username) // 保存真实姓名
           
           ElMessage.success('登录成功')
           router.push('/')
@@ -169,3 +170,4 @@ h1 {
   border-radius: 10px;
 }
 </style>
+

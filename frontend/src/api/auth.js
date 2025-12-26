@@ -16,3 +16,20 @@ export const getCurrentUser = () => {
     method: 'get'
   })
 }
+
+// 获取用户详细信息
+export const getUserInfo = () => {
+  return request({
+    url: '/auth/user',
+    method: 'get'
+  })
+}
+
+// 更新真实姓名
+export const updateRealName = (realName) => {
+  return request({
+    url: '/auth/user/realname',
+    method: 'put',
+    data: { realName }
+  })
+}

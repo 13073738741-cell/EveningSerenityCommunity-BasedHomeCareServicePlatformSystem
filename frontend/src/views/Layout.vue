@@ -24,6 +24,14 @@
             <el-icon><Document /></el-icon>
             <span>健康能力档案管理</span>
           </el-menu-item>
+          <el-menu-item index="/environment-assessment-manage">
+            <el-icon><Document /></el-icon>
+            <span>家庭环境档案管理</span>
+          </el-menu-item>
+          <el-menu-item index="/care-record-manage">
+            <el-icon><Document /></el-icon>
+            <span>关爱档案管理</span>
+          </el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -42,6 +50,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item command="profile">个人信息</el-dropdown-item>
                 <el-dropdown-item command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -53,6 +62,29 @@
         <router-view />
       </el-main>
     </el-container>
+    
+    <!-- 个人信息对话框 -->
+    <el-dialog
+      v-model="profileDialogVisible"
+      title="个人信息"
+      width="500px"
+    >
+      <el-form :model="profileForm" label-width="100px">
+        <el-form-item label="用户名">
+          <el-input v-model="profileForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="真实姓名">
+          <el-input v-model="profileForm.realName" placeholder="请输入真实姓名" />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-input v-model="profileForm.role" disabled />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="profileDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSaveProfile" :loading="profileLoading">保存</el-button>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -60,20 +92,34 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getUserInfo, updateRealName } from '../api/auth'
 
 const router = useRouter()
 const route = useRoute()
 
 const username = ref('')
+const profileDialogVisible = ref(false)
+const profileLoading = ref(false)
+const profileForm = ref({
+  username: '',
+  realName: '',
+  role: ''
+})
 
 const activeMenu = computed(() => route.path)
 
 onMounted(() => {
-  username.value = localStorage.getItem('username') || '管理员'
+  // 优先显示真实姓名，如果没有则显示用户名
+  const realName = localStorage.getItem('realName')
+  const usernameFromStorage = localStorage.getItem('username')
+  username.value = realName || usernameFromStorage || '管理员'
 })
 
 const handleCommand = async (command) => {
-  if (command === 'logout') {
+  if (command === 'profile') {
+    await loadUserInfo()
+    profileDialogVisible.value = true
+  } else if (command === 'logout') {
     try {
       await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
         confirmButtonText: '确定',
@@ -90,6 +136,50 @@ const handleCommand = async (command) => {
     } catch (error) {
       // 用户取消操作
     }
+  }
+}
+
+const loadUserInfo = async () => {
+  try {
+    const response = await getUserInfo()
+    if (response.success) {
+      profileForm.value = {
+        username: response.username,
+        realName: response.realName || '',
+        role: response.role
+      }
+    } else {
+      ElMessage.error(response.message || '获取用户信息失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取用户信息失败')
+  }
+}
+
+const handleSaveProfile = async () => {
+  if (!profileForm.value.realName || profileForm.value.realName.trim() === '') {
+    ElMessage.warning('请输入真实姓名')
+    return
+  }
+  
+  profileLoading.value = true
+  try {
+    const response = await updateRealName(profileForm.value.realName)
+    if (response.success) {
+      // 更新localStorage中的realName
+      localStorage.setItem('realName', response.realName)
+      // 更新显示的用户名
+      username.value = response.realName || profileForm.value.username
+      
+      ElMessage.success('保存成功')
+      profileDialogVisible.value = false
+    } else {
+      ElMessage.error(response.message || '保存失败')
+    }
+  } catch (error) {
+    ElMessage.error('保存失败')
+  } finally {
+    profileLoading.value = false
   }
 }
 </script>
@@ -211,3 +301,8 @@ const handleCommand = async (command) => {
   padding: 20px;
 }
 </style>
+
+
+
+
+

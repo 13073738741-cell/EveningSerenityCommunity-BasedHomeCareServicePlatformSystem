@@ -17,8 +17,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="评估人" prop="assessor">
-              <el-input v-model="form.assessor" placeholder="请输入评估人姓名" />
+            <el-form-item label="评估人" prop="assessorName">
+              <el-input v-model="form.assessorName" placeholder="请输入评估人姓名" disabled />
             </el-form-item>
           </el-col>
         </el-row>
@@ -34,34 +34,11 @@
           </el-select>
         </el-form-item>
         
-        <el-form-item label="居住面积" prop="area">
-          <el-input v-model="form.area" placeholder="请输入居住面积（平方米）">
-            <template #append>㎡</template>
-          </el-input>
-        </el-form-item>
-        
-        <el-form-item label="楼层情况" prop="floor">
-          <el-input v-model="form.floor" placeholder="请输入楼层（如：3/6）" />
-        </el-form-item>
-        
         <el-form-item label="是否有电梯" prop="hasElevator">
           <el-radio-group v-model="form.hasElevator">
             <el-radio :label="true">有</el-radio>
             <el-radio :label="false">无</el-radio>
           </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="采光通风" prop="lighting">
-          <el-rate v-model="form.lighting" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="室内温度" prop="temperature">
-          <el-select v-model="form.temperature" placeholder="请选择室内温度情况" style="width: 100%">
-            <el-option label="适宜" value="suitable" />
-            <el-option label="偏冷" value="cold" />
-            <el-option label="偏热" value="hot" />
-            <el-option label="不稳定" value="unstable" />
-          </el-select>
         </el-form-item>
 
         <el-divider content-position="left">安全设施评估</el-divider>
@@ -81,143 +58,12 @@
             <el-checkbox label="无" />
           </el-checkbox-group>
         </el-form-item>
-        
-        <el-form-item label="照明设施" prop="lightingFacilities">
-          <el-radio-group v-model="form.lightingFacilities">
-            <el-radio label="good">良好</el-radio>
-            <el-radio label="average">一般</el-radio>
-            <el-radio label="poor">较差</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="消防安全" prop="fireSafety">
-          <el-checkbox-group v-model="form.fireSafety">
-            <el-checkbox label="灭火器" />
-            <el-checkbox label="烟雾报警器" />
-            <el-checkbox label="燃气报警器" />
-            <el-checkbox label="应急照明" />
-          </el-checkbox-group>
-        </el-form-item>
-        
-        <el-form-item label="电路安全" prop="electricSafety">
-          <el-radio-group v-model="form.electricSafety">
-            <el-radio label="good">良好</el-radio>
-            <el-radio label="average">一般</el-radio>
-            <el-radio label="poor">较差</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-divider content-position="left">生活设施评估</el-divider>
-        <el-form-item label="卫生间设施" prop="bathroom">
-          <el-rate v-model="form.bathroom" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="厨房设施" prop="kitchen">
-          <el-rate v-model="form.kitchen" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="供水情况" prop="waterSupply">
-          <el-radio-group v-model="form.waterSupply">
-            <el-radio label="good">稳定充足</el-radio>
-            <el-radio label="average">基本满足</el-radio>
-            <el-radio label="poor">不足或不稳定</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="供电情况" prop="powerSupply">
-          <el-radio-group v-model="form.powerSupply">
-            <el-radio label="good">稳定</el-radio>
-            <el-radio label="average">偶尔中断</el-radio>
-            <el-radio label="poor">经常中断</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="供暖/制冷" prop="hvac">
-          <el-checkbox-group v-model="form.hvac">
-            <el-checkbox label="空调" />
-            <el-checkbox label="暖气" />
-            <el-checkbox label="电暖器" />
-            <el-checkbox label="无" />
-          </el-checkbox-group>
-        </el-form-item>
-
-        <el-divider content-position="left">无障碍设施评估</el-divider>
-        <el-form-item label="门宽是否适合轮椅" prop="doorWidth">
-          <el-radio-group v-model="form.doorWidth">
-            <el-radio :label="true">适合</el-radio>
-            <el-radio :label="false">不适合</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="是否有坡道" prop="ramp">
-          <el-radio-group v-model="form.ramp">
-            <el-radio :label="true">有</el-radio>
-            <el-radio :label="false">无</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="床铺高度" prop="bedHeight">
-          <el-select v-model="form.bedHeight" placeholder="请选择床铺高度" style="width: 100%">
-            <el-option label="适宜" value="suitable" />
-            <el-option label="偏高" value="high" />
-            <el-option label="偏低" value="low" />
-          </el-select>
-        </el-form-item>
-
-        <el-divider content-position="left">卫生环境评估</el-divider>
-        <el-form-item label="室内卫生" prop="indoorHygiene">
-          <el-rate v-model="form.indoorHygiene" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="垃圾处理" prop="garbageDisposal">
-          <el-radio-group v-model="form.garbageDisposal">
-            <el-radio label="good">及时处理</el-radio>
-            <el-radio label="average">偶尔堆积</el-radio>
-            <el-radio label="poor">经常堆积</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        
-        <el-form-item label="虫害防治" prop="pestControl">
-          <el-radio-group v-model="form.pestControl">
-            <el-radio label="good">良好</el-radio>
-            <el-radio label="average">一般</el-radio>
-            <el-radio label="poor">有虫害</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-divider content-position="left">周边环境评估</el-divider>
-        <el-form-item label="交通便利" prop="transportation">
-          <el-rate v-model="form.transportation" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="医疗资源" prop="medicalResources">
-          <el-rate v-model="form.medicalResources" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="购物便利" prop="shopping">
-          <el-rate v-model="form.shopping" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="社区服务" prop="communityService">
-          <el-rate v-model="form.communityService" :max="5" show-text />
-        </el-form-item>
-        
-        <el-form-item label="噪音水平" prop="noise">
-          <el-select v-model="form.noise" placeholder="请选择噪音水平" style="width: 100%">
-            <el-option label="安静" value="quiet" />
-            <el-option label="一般" value="average" />
-            <el-option label="嘈杂" value="noisy" />
-          </el-select>
-        </el-form-item>
 
         <el-divider content-position="left">评估总结</el-divider>
         <el-form-item label="综合评估结果" prop="overallResult">
           <el-select v-model="form.overallResult" placeholder="请选择综合评估结果" style="width: 100%">
-            <el-option label="优秀" value="excellent" />
-            <el-option label="良好" value="good" />
-            <el-option label="一般" value="average" />
-            <el-option label="较差" value="poor" />
-            <el-option label="需要改善" value="need_improvement" />
+            <el-option label="安全" value="safe" />
+            <el-option label="需要改善" value="needs improvement" />
           </el-select>
         </el-form-item>
         
@@ -238,15 +84,6 @@
             placeholder="请输入改善建议"
           />
         </el-form-item>
-        
-        <el-form-item label="备注" prop="notes">
-          <el-input
-            v-model="form.notes"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入备注信息"
-          />
-        </el-form-item>
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit" :loading="loading">保存评估</el-button>
@@ -262,63 +99,117 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getElderlyById } from '../api/elderly'
-import { createEnvironmentAssessment, updateEnvironmentAssessment } from '../api/environmentAssessment'
+import { createEnvironmentAssessment, updateEnvironmentAssessment, getEnvironmentAssessmentById, getEnvironmentAssessmentList } from '../api/environmentAssessment'
+import { getUserInfo } from '../api/auth'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const loading = ref(false)
 const elderlyName = ref('')
+const existingAssessmentId = ref(null) // 存储已存在的评估记录ID
 
 const form = reactive({
+  id: null,
   elderlyId: route.params.elderlyId,
   assessmentDate: new Date(),
-  assessor: '',
+  assessorName: '',
   houseType: 'owned',
-  area: '',
-  floor: '',
   hasElevator: false,
-  lighting: 4,
-  temperature: 'suitable',
   floorSafety: 'good',
   handrails: [],
-  lightingFacilities: 'good',
-  fireSafety: [],
-  electricSafety: 'good',
-  bathroom: 4,
-  kitchen: 4,
-  waterSupply: 'good',
-  powerSupply: 'good',
-  hvac: [],
-  doorWidth: false,
-  ramp: false,
-  bedHeight: 'suitable',
-  indoorHygiene: 4,
-  garbageDisposal: 'good',
-  pestControl: 'good',
-  transportation: 4,
-  medicalResources: 4,
-  shopping: 4,
-  communityService: 4,
-  noise: 'quiet',
-  overallResult: 'good',
+  overallResult: 'safe',
   problems: '',
-  suggestions: '',
-  notes: ''
+  suggestions: ''
 })
 
 const rules = {
   assessmentDate: [{ required: true, message: '请选择评估日期', trigger: 'change' }],
-  assessor: [{ required: true, message: '请输入评估人姓名', trigger: 'blur' }],
+  assessorName: [{ required: true, message: '请输入评估人姓名', trigger: 'blur' }],
   overallResult: [{ required: true, message: '请选择综合评估结果', trigger: 'change' }]
 }
 
 const loadElderlyInfo = async () => {
+  if (!route.params.elderlyId || route.params.elderlyId === 'undefined') {
+    ElMessage.error('缺少老人ID参数')
+    router.back()
+    return
+  }
   try {
     const response = await getElderlyById(route.params.elderlyId)
     elderlyName.value = response.data?.name || response.name || ''
   } catch (error) {
     ElMessage.error('加载老人信息失败')
+  }
+}
+
+const loadUserInfo = async () => {
+  try {
+    const response = await getUserInfo()
+    if (response.success) {
+      // 始终使用当前用户的真实姓名作为评估人
+      form.assessorName = response.realName || response.username
+    }
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  }
+}
+
+const loadEnvironmentAssessment = async (elderlyId) => {
+  if (!elderlyId || elderlyId === 'undefined') {
+    return
+  }
+  loading.value = true
+  try {
+    // 获取该老人的所有环境评估记录
+    const response = await getEnvironmentAssessmentList(elderlyId, { page: 1, pageSize: 1 })
+    console.log('环境评估查询响应:', response)
+    console.log('response.data:', response.data)
+    console.log('response类型:', typeof response)
+    console.log('response是否为数组:', Array.isArray(response))
+
+    const assessments = response.data || response
+    console.log('评估记录数组:', assessments)
+    console.log('assessments是否为数组:', Array.isArray(assessments))
+
+    if (Array.isArray(assessments) && assessments.length > 0) {
+      // 获取最新的评估记录（假设列表按时间倒序排列，取第一个）
+      const latestAssessment = assessments[0]
+      console.log('找到最新评估记录:', latestAssessment)
+      console.log('latestAssessment.problems:', latestAssessment.problems)
+      console.log('latestAssessment.suggestions:', latestAssessment.suggestions)
+
+      existingAssessmentId.value = latestAssessment.id
+      console.log('找到最新评估记录，ID:', latestAssessment.id)
+
+      // 将评估记录数据填充到表单
+      Object.assign(form, {
+        id: latestAssessment.id,
+        elderlyId: latestAssessment.elderlyId,
+        assessmentDate: latestAssessment.assessmentDate ? new Date(latestAssessment.assessmentDate) : new Date(),
+        assessorName: '', // 不使用历史记录中的评估人，稍后会重新加载当前用户
+        houseType: latestAssessment.houseType || 'owned',
+        hasElevator: latestAssessment.hasElevator !== undefined ? latestAssessment.hasElevator : false,
+        floorSafety: latestAssessment.floorSafety || 'good',
+        handrails: latestAssessment.handrails ? (typeof latestAssessment.handrails === 'string' ? latestAssessment.handrails.split(',') : latestAssessment.handrails) : [],
+        overallResult: latestAssessment.overallResult || 'good',
+        problems: latestAssessment.problems || '',
+        suggestions: latestAssessment.suggestions || ''
+      })
+
+      console.log('表单数据已更新:', form)
+      console.log('form.problems:', form.problems)
+      console.log('form.suggestions:', form.suggestions)
+      
+      // 重新加载当前用户信息作为评估人，不使用历史记录中的评估人
+      await loadUserInfo()
+    } else {
+      console.log('未找到评估记录，使用默认表单数据')
+    }
+  } catch (error) {
+    console.error('加载环境评估失败:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -329,10 +220,17 @@ const handleSubmit = async () => {
     if (valid) {
       loading.value = true
       try {
-        if (form.id) {
-          await updateEnvironmentAssessment(form.id, form)
+        // 将handrails数组转换为字符串（用逗号分隔）
+        const submitData = {
+          ...form,
+          handrails: Array.isArray(form.handrails) ? form.handrails.join(',') : form.handrails
+        }
+        
+        // 如果存在之前的评估记录，则更新；否则创建新记录
+        if (existingAssessmentId.value) {
+          await updateEnvironmentAssessment(existingAssessmentId.value, submitData)
         } else {
-          await createEnvironmentAssessment(form)
+          await createEnvironmentAssessment(submitData)
         }
         ElMessage.success('保存成功')
         goBack()
@@ -351,6 +249,8 @@ const goBack = () => {
 
 onMounted(() => {
   loadElderlyInfo()
+  loadUserInfo() // 加载用户信息以设置默认评估人
+  loadEnvironmentAssessment(route.params.elderlyId)
 })
 </script>
 
@@ -367,3 +267,8 @@ onMounted(() => {
   margin-left: 10px;
 }
 </style>
+
+
+
+
+

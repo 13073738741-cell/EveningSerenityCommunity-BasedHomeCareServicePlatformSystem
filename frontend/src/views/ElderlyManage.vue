@@ -38,14 +38,18 @@
         <el-table-column prop="idCard" label="身份证号" width="180" />
         <el-table-column prop="phone" label="联系电话" width="130" />
         <el-table-column prop="address" label="住址" min-width="200" />
-        <el-table-column prop="healthStatus" label="健康状况" width="150">
+        <el-table-column prop="healthStatus" label="健康状况" width="180">
           <template #default="{ row }">
             <div>
-              <el-tag :type="getHealthStatusType(row.healthStatus)" style="margin-bottom: 5px">
-                {{ row.healthStatus }}
+              <el-tag :type="(elderlyOverallResultMap.get(row.id) && elderlyOverallResultMap.get(row.id).trim()) ? 
+                          getOverallResultType(elderlyOverallResultMap.get(row.id)) : 
+                          getHealthStatusType(row.healthStatus)" style="margin-bottom: 5px">
+                {{ (elderlyOverallResultMap.get(row.id) && elderlyOverallResultMap.get(row.id).trim()) ? 
+                    getOverallResultLabel(elderlyOverallResultMap.get(row.id)) : 
+                    (row.healthStatus || '未设置') }}
               </el-tag>
               <div v-if="elderlyAdlMap.has(row.id)" style="font-size: 12px; color: #606266">
-                ADL: <span style="font-weight: bold; color: #409EFF">{{ elderlyAdlMap.get(row.id) }}分</span>
+                ADL: <span :style="{ fontWeight: 'bold', color: getOverallResultColor(elderlyOverallResultMap.get(row.id)) }">{{ elderlyAdlMap.get(row.id) }}分</span>
               </div>
               <div v-else style="font-size: 12px; color: #909399">
                 未评估
@@ -53,20 +57,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="careLevel" label="护理等级" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getCareLevelType(row.careLevel)">
-              {{ row.careLevel }}
-            </el-tag>
-          </template>
-        </el-table-column>
         <el-table-column label="操作" width="350" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-            <el-dropdown @command="(command) => handleDropdownCommand(command, row)">
-              <el-button type="info" size="small">
+            <el-dropdown @command="(command) => handleDropdownCommand(command, row)" style="display: inline-block; vertical-align: middle">
+              <el-button type="info" size="small" style="margin-left: 8px">
                 更多<el-icon class="el-icon--right"><arrow-down /></el-icon>
               </el-button>
               <template #dropdown>
@@ -217,6 +214,7 @@ const pagination = reactive({
 
 const tableData = ref([])
 const elderlyAdlMap = ref(new Map()) // 存储每个老人的最新ADL分数
+const elderlyOverallResultMap = ref(new Map()) // 存储每个老人的最新综合评估结果
 const form = reactive({
   id: null,
   name: '',
@@ -268,13 +266,20 @@ const loadData = async () => {
   }
 }
 
-// 加载所有老人的最新ADL分数
+// 加载所有老人的最新ADL分数和综合评估结果
 const loadAllAdlScores = async () => {
   try {
     elderlyAdlMap.value.clear()
+    elderlyOverallResultMap.value.clear()
     
     // 为每个老人获取最新的健康评估记录
     for (const elderly of tableData.value) {
+      // 确保elderly.id存在才调用API
+      if (!elderly.id) {
+        console.warn(`老人数据缺少ID字段:`, elderly)
+        continue
+      }
+      
       try {
         const response = await getHealthAssessmentList(elderly.id, { page: 1, pageSize: 1 })
         console.log(`老人 ${elderly.name} (ID: ${elderly.id}) 的评估数据:`, response)
@@ -300,6 +305,11 @@ const loadAllAdlScores = async () => {
           
           console.log(`计算得到的ADL总分:`, adlTotal)
           elderlyAdlMap.value.set(elderly.id, adlTotal)
+          
+          // 存储综合评估结果
+          if (latestAssessment.overallResult) {
+            elderlyOverallResultMap.value.set(elderly.id, latestAssessment.overallResult)
+          }
         } else {
           console.log(`老人 ${elderly.name} 没有评估记录`)
         }
@@ -310,11 +320,47 @@ const loadAllAdlScores = async () => {
     }
     
     console.log('所有老人的ADL分数Map:', elderlyAdlMap.value)
+    console.log('所有老人的综合评估结果Map:', elderlyOverallResultMap.value)
   } catch (error) {
     console.error('加载ADL分数失败', error)
   }
 }
 
+// 获取综合评估结果的中文标签
+const getOverallResultLabel = (value) => {
+  const labels = {
+    'healthy': '健康',
+    'basically_healthy': '基本健康',
+    'sub_healthy': '亚健康',
+    'attention_needed': '需重点关注',
+    'medical_intervention': '需医疗干预'
+  }
+  return labels[value] || value
+}
+
+// 获取综合评估结果对应的标签颜色类型
+const getOverallResultType = (value) => {
+  const typeMap = {
+    'healthy': 'success',
+    'basically_healthy': 'primary',
+    'sub_healthy': 'warning',
+    'attention_needed': 'danger',
+    'medical_intervention': 'danger'
+  }
+  return typeMap[value] || 'info'
+}
+
+// 获取综合评估结果对应的颜色值
+const getOverallResultColor = (value) => {
+  const colorMap = {
+    'healthy': '#67C23A',
+    'basically_healthy': '#409EFF',
+    'sub_healthy': '#E6A23C',
+    'attention_needed': '#F56C6C',
+    'medical_intervention': '#F56C6C'
+  }
+  return colorMap[value] || '#409EFF'
+}
 const handleSearch = () => {
   pagination.page = 1
   loadData()
@@ -330,16 +376,23 @@ const handleView = (row) => {
   ElMessage.info('查看功能待实现')
 }
 
-const handleDropdownCommand = (command, row) => {
+const handleDropdownCommand = async (command, row) => {
+  // 检查老人ID是否存在
+  if (!row.id) {
+    ElMessage.error('老人ID不存在，无法进行操作')
+    return
+  }
+
   switch (command) {
     case 'health':
       router.push({ name: 'HealthAssessment', params: { elderlyId: row.id } })
       break
     case 'environment':
+      // 直接跳转到环境评估页面，页面会自动加载最新的评估记录
       router.push({ name: 'EnvironmentAssessment', params: { elderlyId: row.id } })
       break
     case 'care':
-      router.push({ name: 'CareRecord', params: { elderlyId: row.id } })
+      router.push({ name: 'CareRecordDetail', params: { elderlyId: row.id } })
       break
   }
 }
@@ -479,3 +532,9 @@ onMounted(() => {
   display: flex;
 }
 </style>
+
+
+
+
+
+

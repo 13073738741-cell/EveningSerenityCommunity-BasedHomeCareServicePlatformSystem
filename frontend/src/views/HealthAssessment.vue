@@ -17,8 +17,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="评估人" prop="assessor">
-              <el-input v-model="form.assessor" placeholder="请输入评估人姓名" />
+            <el-form-item label="评估人" prop="assessorName">
+              <el-input v-model="form.assessorName" placeholder="请输入评估人姓名" disabled />
             </el-form-item>
           </el-col>
         </el-row>
@@ -222,18 +222,20 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getElderlyById } from '../api/elderly'
-import { createHealthAssessment, updateHealthAssessment } from '../api/healthAssessment'
+import { createHealthAssessment, updateHealthAssessment, getHealthAssessmentList } from '../api/healthAssessment'
+import { getUserInfo } from '../api/auth'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const loading = ref(false)
 const elderlyName = ref('')
+const existingAssessmentId = ref(null) // 存储已存在的评估记录ID
 
 const form = reactive({
   elderlyId: route.params.elderlyId,
   assessmentDate: new Date(),
-  assessor: '',
+  assessorName: '',
   eating: 10,
   bathing: 5,
   grooming: 5,
@@ -260,7 +262,7 @@ const form = reactive({
 
 const rules = {
   assessmentDate: [{ required: true, message: '请选择评估日期', trigger: 'change' }],
-  assessor: [{ required: true, message: '请输入评估人姓名', trigger: 'blur' }],
+  assessorName: [{ required: true, message: '请输入评估人姓名', trigger: 'blur' }],
   overallResult: [{ required: true, message: '请选择综合评估结果', trigger: 'change' }]
 }
 
@@ -285,6 +287,11 @@ const getAdlLevel = (score) => {
 }
 
 const loadElderlyInfo = async () => {
+  if (!route.params.elderlyId || route.params.elderlyId === 'undefined') {
+    ElMessage.error('缺少老人ID参数')
+    router.back()
+    return
+  }
   try {
     const response = await getElderlyById(route.params.elderlyId)
     elderlyName.value = response.data?.name || response.name || ''
@@ -293,17 +300,40 @@ const loadElderlyInfo = async () => {
   }
 }
 
+const loadUserInfo = async () => {
+  try {
+    const response = await getUserInfo()
+    if (response.success) {
+      // 始终使用当前用户的真实姓名作为评估人
+      form.assessorName = response.realName || response.username
+    }
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  }
+}
+
 const loadHealthAssessment = async (elderlyId) => {
+  if (!elderlyId || elderlyId === 'undefined') {
+    return
+  }
   loading.value = true
   try {
-    const response = await getHealthAssessmentByElderlyId(elderlyId)
-    if (response.data) {
+    // 获取该老人的所有评估记录
+    const response = await getHealthAssessmentList(elderlyId)
+    if (response && response.length > 0) {
+      // 获取最新的评估记录（假设列表按时间倒序排列，取第一个）
+      const latestAssessment = response[0]
+      existingAssessmentId.value = latestAssessment.id
+      
       // 将字符串格式的diseases转换为数组
-      const data = response.data
+      const data = { ...latestAssessment }
       if (data.diseases && typeof data.diseases === 'string') {
         data.diseases = data.diseases.split(',').map(d => d.trim()).filter(d => d)
       }
       Object.assign(form, data)
+      
+      // 重新加载当前用户信息作为评估人，不使用历史记录中的评估人
+      await loadUserInfo()
     }
   } catch (error) {
     console.error('加载健康评估失败:', error)
@@ -325,8 +355,9 @@ const handleSubmit = async () => {
           diseases: Array.isArray(form.diseases) ? form.diseases.join(',') : form.diseases
         }
         
-        if (form.id) {
-          await updateHealthAssessment(form.id, submitData)
+        // 如果存在之前的评估记录，则更新；否则创建新记录
+        if (existingAssessmentId.value) {
+          await updateHealthAssessment(existingAssessmentId.value, submitData)
         } else {
           await createHealthAssessment(submitData)
         }
@@ -347,6 +378,8 @@ const goBack = () => {
 
 onMounted(() => {
   loadElderlyInfo()
+  loadUserInfo() // 加载用户信息以设置默认评估人
+  loadHealthAssessment(route.params.elderlyId)
 })
 </script>
 

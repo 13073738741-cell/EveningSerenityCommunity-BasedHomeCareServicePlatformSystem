@@ -1,5 +1,6 @@
 package com.elderlycare.controller;
 
+import com.elderlycare.dto.ApiResponse;
 import com.elderlycare.entity.CareRecord;
 import com.elderlycare.service.CareRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,85 @@ public class CareRecordController {
     }
     
     @GetMapping
-    public ResponseEntity<List<CareRecord>> getAllCareRecords() {
-        List<CareRecord> records = careRecordService.findAll();
-        return new ResponseEntity<>(records, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<List<CareRecord>>> getAllCareRecords(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) String elderlyName,
+            @RequestParam(required = false) String careType,
+            @RequestParam(required = false) String caregiverName,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        List<CareRecord> allRecords = careRecordService.findAll();
+        
+        // Apply filters
+        if (elderlyName != null && !elderlyName.trim().isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(record -> record.getElderlyName() != null && 
+                            record.getElderlyName().contains(elderlyName))
+                    .toList();
+        }
+        
+        if (careType != null && !careType.trim().isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(record -> record.getCareType() != null && 
+                            record.getCareType().contains(careType))
+                    .toList();
+        }
+        
+        if (caregiverName != null && !caregiverName.trim().isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(record -> record.getCaregiverName() != null && 
+                            record.getCaregiverName().contains(caregiverName))
+                    .toList();
+        }
+        
+        // Apply date range filter
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(record -> record.getCareDate() != null && 
+                            record.getCareDate().toString().compareTo(startDate) >= 0)
+                    .toList();
+        }
+        
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(record -> record.getCareDate() != null && 
+                            record.getCareDate().toString().compareTo(endDate) <= 0)
+                    .toList();
+        }
+        
+        // Apply pagination
+        int total = allRecords.size();
+        if (page != null && pageSize != null && page > 0 && pageSize > 0) {
+            int startIndex = (page - 1) * pageSize;
+            if (startIndex < allRecords.size()) {
+                int endIndex = Math.min(startIndex + pageSize, allRecords.size());
+                allRecords = allRecords.subList(startIndex, endIndex);
+            } else {
+                allRecords = List.of();
+            }
+        }
+        
+        ApiResponse<List<CareRecord>> response = ApiResponse.success(allRecords, total);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping("/elderly/{elderlyId}")
     public ResponseEntity<List<CareRecord>> getCareRecordsByElderlyId(@PathVariable Long elderlyId) {
         List<CareRecord> records = careRecordService.findByElderlyId(elderlyId);
+        return new ResponseEntity<>(records, HttpStatus.OK);
+    }
+    
+    @GetMapping("/care-type/{careType}")
+    public ResponseEntity<List<CareRecord>> getCareRecordsByCareType(@PathVariable String careType) {
+        List<CareRecord> records = careRecordService.findByCareType(careType);
+        return new ResponseEntity<>(records, HttpStatus.OK);
+    }
+    
+    @GetMapping("/caregiver/{caregiverName}")
+    public ResponseEntity<List<CareRecord>> getCareRecordsByCaregiverName(@PathVariable String caregiverName) {
+        List<CareRecord> records = careRecordService.findByCaregiverName(caregiverName);
         return new ResponseEntity<>(records, HttpStatus.OK);
     }
     

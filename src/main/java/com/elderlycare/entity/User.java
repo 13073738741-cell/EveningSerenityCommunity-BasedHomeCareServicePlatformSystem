@@ -19,6 +19,8 @@ public class User {
     
     private String role;
     
+    private String realName;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
@@ -66,6 +68,14 @@ public class User {
     
     public void setRole(String role) {
         this.role = role;
+    }
+    
+    public String getRealName() {
+        return realName;
+    }
+    
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
     
     public LocalDateTime getCreatedAt() {

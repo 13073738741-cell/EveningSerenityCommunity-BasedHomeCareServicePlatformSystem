@@ -6,6 +6,8 @@ import HealthAssessment from '../views/HealthAssessment.vue'
 import EnvironmentAssessment from '../views/EnvironmentAssessment.vue'
 import CareRecord from '../views/CareRecord.vue'
 import HealthAssessmentManage from '../views/HealthAssessmentManage.vue'
+import EnvironmentAssessmentManage from '../views/EnvironmentAssessmentManage.vue'
+import CareRecordManage from '../views/CareRecordManage.vue'
 
 const routes = [
   {
@@ -29,6 +31,16 @@ const routes = [
         component: HealthAssessmentManage
       },
       {
+        path: 'environment-assessment-manage',
+        name: 'EnvironmentAssessmentManage',
+        component: EnvironmentAssessmentManage
+      },
+      {
+        path: 'care-record-manage',
+        name: 'CareRecordManage',
+        component: CareRecordManage
+      },
+      {
         path: 'health-assessment/:elderlyId',
         name: 'HealthAssessment',
         component: HealthAssessment,
@@ -42,7 +54,7 @@ const routes = [
       },
       {
         path: 'care-record/:elderlyId',
-        name: 'CareRecord',
+        name: 'CareRecordDetail',
         component: CareRecord,
         props: true
       }

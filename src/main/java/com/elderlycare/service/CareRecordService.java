@@ -23,7 +23,15 @@ public class CareRecordService {
     }
     
     public List<CareRecord> findByElderlyId(Long elderlyId) {
-        return careRecordRepository.findByElderlyIdOrderByCreateDateDesc(elderlyId);
+        return careRecordRepository.findByElderlyIdOrderByCareDateDesc(elderlyId);
+    }
+    
+    public List<CareRecord> findByCareType(String careType) {
+        return careRecordRepository.findByCareType(careType);
+    }
+    
+    public List<CareRecord> findByCaregiverName(String caregiverName) {
+        return careRecordRepository.findByCaregiverName(caregiverName);
     }
     
     public List<CareRecord> findAll() {

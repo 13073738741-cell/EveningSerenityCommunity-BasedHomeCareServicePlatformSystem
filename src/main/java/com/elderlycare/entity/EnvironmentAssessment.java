@@ -16,30 +16,26 @@ public class EnvironmentAssessment {
     @Column(name = "assessment_date", nullable = false)
     private String assessmentDate;
 
-    @Column(name = "housing_type")
-    private String housingType;
+    @Column(name = "house_type")
+    private String houseType;
 
-    @Column(name = "floor_level")
-    private Integer floorLevel;
+    @Column(name = "has_elevator")
+    private Boolean hasElevator;
 
-    @Column(name = "safety_score")
-    private Integer safetyScore;
+    @Column(name = "floor_safety")
+    private String floorSafety;
 
-    @Column(name = "bathroom_safety")
-    private String bathroomSafety;
+    @Column(name = "handrails")
+    private String handrails;
 
-    @Column(name = "kitchen_safety")
-    private String kitchenSafety;
+    @Column(name = "overall_result")
+    private String overallResult;
 
-    private String lighting;
+    @Column(name = "problems")
+    private String problems;
 
-    private String ventilation;
-
-    private String accessibility;
-
-    private String hazards;
-
-    private String recommendations;
+    @Column(name = "suggestions")
+    private String suggestions;
 
     @Column(name = "assessor_name")
     private String assessorName;
@@ -76,84 +72,60 @@ public class EnvironmentAssessment {
         this.assessmentDate = assessmentDate;
     }
 
-    public String getHousingType() {
-        return housingType;
+    public String getHouseType() {
+        return houseType;
     }
 
-    public void setHousingType(String housingType) {
-        this.housingType = housingType;
+    public void setHouseType(String houseType) {
+        this.houseType = houseType;
     }
 
-    public Integer getFloorLevel() {
-        return floorLevel;
+    public Boolean getHasElevator() {
+        return hasElevator;
     }
 
-    public void setFloorLevel(Integer floorLevel) {
-        this.floorLevel = floorLevel;
+    public void setHasElevator(Boolean hasElevator) {
+        this.hasElevator = hasElevator;
     }
 
-    public Integer getSafetyScore() {
-        return safetyScore;
+    public String getFloorSafety() {
+        return floorSafety;
     }
 
-    public void setSafetyScore(Integer safetyScore) {
-        this.safetyScore = safetyScore;
+    public void setFloorSafety(String floorSafety) {
+        this.floorSafety = floorSafety;
     }
 
-    public String getBathroomSafety() {
-        return bathroomSafety;
+    public String getHandrails() {
+        return handrails;
     }
 
-    public void setBathroomSafety(String bathroomSafety) {
-        this.bathroomSafety = bathroomSafety;
+    public void setHandrails(String handrails) {
+        this.handrails = handrails;
     }
 
-    public String getKitchenSafety() {
-        return kitchenSafety;
+    public String getOverallResult() {
+        return overallResult;
     }
 
-    public void setKitchenSafety(String kitchenSafety) {
-        this.kitchenSafety = kitchenSafety;
+    public void setOverallResult(String overallResult) {
+        this.overallResult = overallResult;
     }
 
-    public String getLighting() {
-        return lighting;
+    public String getProblems() {
+        return problems;
     }
 
-    public void setLighting(String lighting) {
-        this.lighting = lighting;
+    public void setProblems(String problems) {
+        this.problems = problems;
     }
 
-    public String getVentilation() {
-        return ventilation;
+    public String getSuggestions() {
+        return suggestions;
     }
 
-    public void setVentilation(String ventilation) {
-        this.ventilation = ventilation;
-    }
-
-    public String getAccessibility() {
-        return accessibility;
-    }
-
-    public void setAccessibility(String accessibility) {
-        this.accessibility = accessibility;
-    }
-
-    public String getHazards() {
-        return hazards;
-    }
-
-    public void setHazards(String hazards) {
-        this.hazards = hazards;
-    }
-
-    public String getRecommendations() {
-        return recommendations;
-    }
-
-    public void setRecommendations(String recommendations) {
-        this.recommendations = recommendations;
+    public void setSuggestions(String suggestions) {
+        this.suggestions = suggestions;
     }
 
     public String getAssessorName() {
